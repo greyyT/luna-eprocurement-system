@@ -7,6 +7,13 @@ import { useEffect } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import EditVendor from './components/EditVendor';
 
+import HomePathIcon from '@/assets/icons/home-path.svg';
+import ArrowIcon from '@/assets/icons/arrow.svg';
+import Product1 from '@/assets/images/product-1.png';
+import ProductDetail1 from '@/assets/images/product-detail-1.png';
+import ProductDetail2 from '@/assets/images/product-detail-2.png';
+import ProductDetail3 from '@/assets/images/product-detail-3.png';
+
 const ProductInfo = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -34,27 +41,27 @@ const ProductInfo = () => {
           <div className="w-[356px]">
             <div className="flex items-center gap-4">
               <Link to={`/?entityCode=${entityCode}`} className="cursor-pointer">
-                <img src="/icons/home-path.svg" alt="" />
+                <img src={HomePathIcon} alt="" />
               </Link>
-              <img src="/icons/arrow.svg" alt="" className="h-3" />
+              <img src={ArrowIcon} alt="" className="h-3" />
               <Link
                 to={`/products?entityCode=${entityCode}`}
                 className="font-inter font-medium leading-6 text-[#637381]"
               >
                 Product List
               </Link>
-              <img src="/icons/arrow.svg" alt="" className="h-3" />
+              <img src={ArrowIcon} alt="" className="h-3" />
               <p className="text-black font-inter font-medium leading-6 underline underline-offset-4 cursor-pointer">
                 {productDetails?.name}
               </p>
             </div>
             <div className="mt-7 w-full">
-              <img src="/images/product-1.png" alt="" className="w-full rounded-lg" />
+              <img src={Product1} alt="" className="w-full rounded-lg" />
             </div>
             <div className="mt-[18px] w-full grid grid-cols-3 gap-[18px]">
-              <img src="/images/product-detail-1.png" alt="" className="w-full" />
-              <img src="/images/product-detail-2.png" alt="" className="w-full" />
-              <img src="/images/product-detail-3.png" alt="" className="w-full" />
+              <img src={ProductDetail1} alt="" className="w-full" />
+              <img src={ProductDetail2} alt="" className="w-full" />
+              <img src={ProductDetail3} alt="" className="w-full" />
             </div>
           </div>
           <div className="w-[470px]">

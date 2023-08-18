@@ -2,6 +2,9 @@ import { useModal } from '@/hooks/useModal';
 import useMountTransition from '@/hooks/useMountTransition';
 import React, { useCallback, useEffect, useState } from 'react';
 
+import ArrowActive from '@/assets/icons/arrow-active.svg';
+import ArrowInactive from '@/assets/icons/arrow-inactive.svg';
+
 interface SelectBoxProps {
   options: any;
   selected: any;
@@ -62,7 +65,7 @@ const SelectBox: React.FC<SelectBoxProps> = React.memo(
               ? selected?.[name]
               : `-- ${alt} --`}
           </p>
-          <img src={`/icons/arrow-${!active ? 'in' : ''}active.svg`} alt="" />
+          <img src={active ? ArrowActive : ArrowInactive} alt="" />
         </div>
         {selected !== false && (active || hasTransitionedIn) && (
           <div className={`select-box ${hasTransitionedIn && 'in'} ${active && 'visible'}`}>

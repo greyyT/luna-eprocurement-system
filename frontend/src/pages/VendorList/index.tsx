@@ -9,6 +9,11 @@ import useVendorList from '@/hooks/useVendorList';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
+import PlusWhite from '@/assets/icons/plus-white.svg';
+import Vendor1 from '@/assets/images/vendor-1.png';
+import TrashInactive from '@/assets/icons/trash-inactive.svg';
+import TrashActive from '@/assets/icons/trash-active.svg';
+
 const VendorList = () => {
   useEffect(() => {
     document.title = 'Vendors List';
@@ -67,7 +72,7 @@ const VendorList = () => {
               code="code"
             />
             <button className="bg-primary h-11 w-11 flex items-center justify-center rounded-[4px]" onClick={onOpen}>
-              <img src="/icons/plus-white.svg" alt="" />
+              <img src={PlusWhite} alt="" />
             </button>
           </div>
         </div>
@@ -86,7 +91,7 @@ const VendorList = () => {
             vendorsList?.data?.map((vendor: any, idx: number) => (
               <div key={idx} className="grid vendors-list-columns w-full">
                 <div className="flex items-center my-[30px]">
-                  <img src="/images/vendor-1.png" alt="" className="w-[70px] mr-5" />
+                  <img src={Vendor1} alt="" className="w-[70px] mr-5" />
                   <div>
                     <Link
                       to={`/vendors/${vendor?.code}?entityCode=${entityCode}`}
@@ -102,8 +107,8 @@ const VendorList = () => {
                 <p className="font-inter text-black font-semibold leading-6 self-center">Group A</p>
                 <div className="flex items-center">
                   <div className="relative h-5 w-4 ml-4 trash-selector cursor-pointer">
-                    <img src="/icons/trash-inactive.svg" alt="" className="absolute trash-inactive" />
-                    <img src="/icons/trash-active.svg" alt="" className="absolute trash-active" />
+                    <img src={TrashInactive} alt="" className="absolute trash-inactive" />
+                    <img src={TrashActive} alt="" className="absolute trash-active" />
                   </div>
                 </div>
               </div>
@@ -112,9 +117,11 @@ const VendorList = () => {
             <p className="py-4 text-center font-inter font-semibold">No vendor added</p>
           )}
         </div>
-        <div className="mt-7 flex items-center justify-center">
-          <Pagination totalPages={vendorsList?.totalPages} />
-        </div>
+        {vendorsList && (
+          <div className="mt-7 flex items-center justify-center">
+            <Pagination totalPages={vendorsList?.totalPages} />
+          </div>
+        )}
       </div>
     </>
   );

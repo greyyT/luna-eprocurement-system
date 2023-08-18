@@ -5,6 +5,9 @@ import { createVendor } from '@/api/entity';
 import useToken from '@/hooks/useToken';
 import { KeyedMutator } from 'swr';
 
+import CloseIcon from '@/assets/icons/close.svg';
+import UploadIcon from '@/assets/images/upload.png';
+
 interface AddVendorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -57,6 +60,8 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
   };
 
   const onSubmit = async () => {
+    if (loading) return;
+
     const vendor = {
       businessName,
       businessNumber,
@@ -91,7 +96,14 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
       >
         <div className="flex justify-between w-full">
           <h1 className="font-inter font-semibold text-2xl text-black">Create a new product</h1>
-          <img src="/icons/close.svg" alt="" onClick={onClose} className="cursor-pointer p-2 hover:" />
+          <img
+            src={CloseIcon}
+            alt=""
+            onClick={() => {
+              if (!loading) onClose();
+            }}
+            className="cursor-pointer p-2 hover:"
+          />
         </div>
         <input type="file" ref={fileInputRef} className="hidden" onChange={onChangeImage} />
         {selectedImage ? (
@@ -107,7 +119,7 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
         ) : (
           <div className="flex justify-center mt-9">
             <div className="flex flex-col items-center justify-center h-[180px] w-[389px] bg-[#F4F7FF] border border-dashed border-spacing-4 border-primary rounded-md">
-              <img src="/images/upload.png" className="h-10 cursor-pointer" alt="" onClick={onAddImage} />
+              <img src={UploadIcon} className="h-10 cursor-pointer" alt="" onClick={onAddImage} />
               <p className="mt-[14px] text-xs font-inter">
                 <span className="text-primary cursor-pointer font-inter hover:underline" onClick={onAddImage}>
                   Click to upload

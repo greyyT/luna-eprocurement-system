@@ -9,6 +9,8 @@ import SelectBox from '@/components/modals/SelectBox';
 import { toast } from 'react-hot-toast';
 import { setUserDepartment, setUserRole, setUserTeam } from '@/api/entity';
 
+import UserPortrait from '@/assets/images/user-portrait.png';
+
 interface EditUserModalProps {
   isOpen: boolean;
   hasTransitionedIn: boolean;
@@ -75,6 +77,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClo
   ];
 
   const onSubmit = async () => {
+    if (loading) return;
+
     let change: boolean = false;
     setLoading(true);
     const toastLoading = toast.loading('Updating user...');
@@ -138,7 +142,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClo
         <h3 className="font-bold font-inter text-2xl leading-[30px] text-black">Edit information</h3>
         <div className="h-[3px] w-[500px] mt-3 bg-primary"></div>
         <div className="flex mt-4 gap-4">
-          <img src="/images/user-portrait.png" alt="" className="w-[45px]" />
+          <img src={UserPortrait} alt="" className="w-[45px]" />
           <div className="flex flex-col justify-center font-inter">
             <p className="text-black text-sm leading-5 font-medium">{member?.username}</p>
             <p className="text-mainText text-sm leading-5">{member?.email}</p>

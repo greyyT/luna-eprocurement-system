@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 
+import PlusCircle from '@/assets/icons/plus-circle.svg';
+
 const Teams = () => {
   useEffect(() => {
     document.title = 'Departments/Teams';
@@ -63,7 +65,7 @@ const Teams = () => {
           <div className="flex gap-4">
             <h3 className="font-inter font-medium text-[15px] leading-[26px] text-black py-4">DEPARTMENT</h3>
             <img
-              src="/icons/plus-circle.svg"
+              src={PlusCircle}
               alt=""
               className="cursor-pointer"
               onClick={() => {

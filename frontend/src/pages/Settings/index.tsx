@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import useToken from '@/hooks/useToken';
 import useCurrentUser from '@/hooks/useCurrentUser';
 
+import CopyIcon from '@/assets/icons/copy.svg';
+
 const Settings = () => {
   const navigate = useNavigate();
 
@@ -12,7 +14,7 @@ const Settings = () => {
   const { data: user } = useCurrentUser(token);
 
   useEffect(() => {
-    if (window.location.pathname === '/settings') {
+    if (window.location.pathname.endsWith('settings')) {
       navigate(`/settings/user-list?entityCode=${user?.legalEntityCode}`);
     }
   }, [user, navigate]);
@@ -67,7 +69,7 @@ const Settings = () => {
             className="bg-primary bg-opacity-[0.08] hover:bg-opacity-25 active:bg-opacity-25 rounded-md p-2"
             onClick={handleCopy}
           >
-            <img src="/icons/copy.svg" alt="" className="w-[26px]" />
+            <img src={CopyIcon} alt="" className="w-[26px]" />
           </button>
         </div>
       </div>

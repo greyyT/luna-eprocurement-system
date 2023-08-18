@@ -56,6 +56,9 @@ const SignUp = () => {
       return;
     }
 
+    setLoading(true);
+    const toastLoading = toast.loading('Signing up...');
+
     const res = await signUp(email, name, password, setError);
 
     if (!res) {
@@ -70,6 +73,8 @@ const SignUp = () => {
       setToken(accessToken);
       navigate('/create-entity');
     }
+
+    toast.dismiss(toastLoading);
   };
 
   return (

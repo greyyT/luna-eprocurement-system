@@ -33,6 +33,8 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, hasT
   if (!isMounted) return null;
 
   const onSubmit = async () => {
+    if (isLoading) return;
+
     const toastLoading = toast.loading('Adding contact...');
     setIsLoading(true);
 
@@ -79,7 +81,9 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, hasT
         </div>
         <div className="flex mt-6 gap-6">
           <button
-            className="flex-1 py-3 border border-solid border-gray-250 rounded-lg text-black font-inter leading-6 font-medium"
+            className={`flex-1 py-3 border border-solid border-gray-250 rounded-lg text-black font-inter leading-6 font-medium ${
+              isLoading ? 'cursor-not-allowed opacity-50' : ''
+            }`}
             onClick={() => {
               if (!isLoading) onClose();
             }}
@@ -87,7 +91,9 @@ const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, hasT
             Close
           </button>
           <button
-            className="flex-1 py-3 font-inter leading-6 font-medium bg-primary text-white rounded-lg"
+            className={`flex-1 py-3 font-inter leading-6 font-medium bg-primary text-white rounded-lg ${
+              isLoading ? 'cursor-not-allowed opacity-50' : ''
+            }`}
             onClick={onSubmit}
           >
             Accept

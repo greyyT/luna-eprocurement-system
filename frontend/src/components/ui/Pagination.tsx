@@ -1,6 +1,8 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import ArrowIcon from '@/assets/icons/arrow.svg';
+
 interface PaginationProps {
   totalPages: number;
 }
@@ -51,7 +53,7 @@ const Pagination: React.FC<PaginationProps> = React.memo(({ totalPages }) => {
           }
           onClick={handlePreviousPage}
         >
-          <img src="/icons/arrow.svg" alt="" className="w-[7px] rotate-180" />
+          <img src={ArrowIcon} alt="" className="w-[7px] rotate-180" />
         </button>
         {pages.map((page, idx) => {
           return (
@@ -74,7 +76,7 @@ const Pagination: React.FC<PaginationProps> = React.memo(({ totalPages }) => {
           }
           onClick={handleNextPage}
         >
-          <img src="/icons/arrow.svg" alt="" className="w-[7px]" />
+          <img src={ArrowIcon} alt="" className="w-[7px]" />
         </button>
       </div>
     </div>
