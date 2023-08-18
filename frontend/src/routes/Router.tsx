@@ -22,7 +22,7 @@ import ProjectList from '@/pages/ProjectList';
 
 export const Router = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.DEV ? '/' : '/lunar-eprocurement-system/'}>
       <Routes>
         <Route
           path="/"
