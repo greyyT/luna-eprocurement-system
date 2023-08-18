@@ -9,6 +9,10 @@ from app.services import get_email_from_token
 
 router = APIRouter()
 
+@router.get('/', tags=['root'])
+def get_root():
+    return {"message": "Welcome to Lunar eProcurement System API"}
+
 @router.get('/api/account', dependencies=[Depends(JWTBearer())], tags=['account'])
 def get_user_info(email: str = Depends(get_email_from_token)):
     user = user_collection.find_one({"email": email})

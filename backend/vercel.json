@@ -1,0 +1,4 @@
+{
+  "builds": [{ "src": "./app/index.py", "use": "@vercel/python", "config": { "runtime": "python3.9" } }],
+  "routes": [{ "src": "./(.*)", "dest": "./app/index.py" }]
+}
