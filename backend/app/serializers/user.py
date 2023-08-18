@@ -1,11 +1,11 @@
-from passlib.hash import bcrypt
+from passlib.hash import sha256_crypt
 
 class User():
     def create(self, user):
         return {
             "email": user["email"],
             "username": user["username"],
-            "password": bcrypt.hash(user["password"]),
+            "password": sha256_crypt.hash(user["password"]),
             "role": None,
             "legalEntityCode": None,
             "departmentCode": None,

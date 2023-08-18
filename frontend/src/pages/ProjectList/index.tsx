@@ -1,6 +1,8 @@
 import SearchBox from '@/components/ui/SearchBox';
 import { useState } from 'react';
 
+import PlusIcon from '@/assets/icons/plus-white.svg';
+
 const ProjectList = () => {
   const [search, setSearch] = useState<string>('');
   return (
@@ -24,7 +26,7 @@ const ProjectList = () => {
               code="code"
             />
             <button className="bg-primary h-11 w-11 flex items-center justify-center rounded-[4px]" onClick={() => {}}>
-              <img src="/icons/plus-white.svg" alt="" />
+              <img src={PlusIcon} alt="" />
             </button>
           </div>
         </div>

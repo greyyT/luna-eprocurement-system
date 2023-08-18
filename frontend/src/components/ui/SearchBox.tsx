@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
 
+import MagnifyingGlass from '@/assets/icons/magnifying.svg';
+import Product1 from '@/assets/images/product-1.png';
+
 interface SearchBoxProps {
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
@@ -20,7 +23,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ search, setSearch, searchResult, 
         value={search}
         onChange={(ev) => setSearch(ev.target.value)}
       />
-      <img src="/icons/magnifying.svg" alt="" className="absolute top-1/2 -translate-y-1/2 left-6" />
+      <img src={MagnifyingGlass} alt="" className="absolute top-1/2 -translate-y-1/2 left-6" />
       {searchResult && searchResult?.length !== 0 && (
         <div className="absolute top-full left-0 w-full bg-white rounded-lg border border-solid border-gray-300 mt-2 z-30">
           <div className="flex flex-col gap-2 p-4">
@@ -33,7 +36,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ search, setSearch, searchResult, 
                     to={`/${api}/${result?.[code]}`}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    <img src="/images/product-1.png" alt="" className="w-[40px]" />
+                    <img src={Product1} alt="" className="w-[40px]" />
                     <div className="flex flex-col gap-1">
                       <p className="font-inter font-semibold text-lg text-black">{result?.[name]}</p>
                       <p className="font-inter font-medium text-[#637381]">{result?.[code]}</p>

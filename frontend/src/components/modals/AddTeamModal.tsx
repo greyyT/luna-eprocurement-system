@@ -105,7 +105,9 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({
           </button>
           <button
             className="flex-1 py-3 font-inter leading-6 font-medium bg-primary text-white rounded-lg"
-            onClick={onSubmit}
+            onClick={() => {
+              if (!isLoading) onSubmit();
+            }}
           >
             Accept
           </button>

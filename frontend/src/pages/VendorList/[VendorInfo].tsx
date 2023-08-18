@@ -7,6 +7,10 @@ import useVendorInfo from '@/hooks/useVendorInfo';
 import { useEffect } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 
+import HomeIcon from '@/assets/icons/home-path.svg';
+import ArrowIcon from '@/assets/icons/arrow.svg';
+import Vendor1 from '@/assets/icons/vendor-1.svg';
+
 const VendorInfo = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -33,20 +37,20 @@ const VendorInfo = () => {
         <div className="w-[468px]">
           <div className="flex items-center gap-4">
             <Link to={`/?entityCode=${entityCode}`} className="cursor-pointer">
-              <img src="/icons/home-path.svg" alt="" />
+              <img src={HomeIcon} alt="" />
             </Link>
-            <img src="/icons/arrow.svg" alt="" className="h-3" />
+            <img src={ArrowIcon} alt="" className="h-3" />
             <Link to={`/vendors/?entityCode=${entityCode}`} className="font-inter font-medium leading-6 text-[#637381]">
               Vendor List
             </Link>
-            <img src="/icons/arrow.svg" alt="" className="h-3" />
+            <img src={ArrowIcon} alt="" className="h-3" />
             <p className="text-black font-inter font-medium leading-6 underline underline-offset-4 cursor-pointer">
               {vendorInfo?.businessName}
             </p>
           </div>
           <div className="mt-7 flex justify-between">
             <h1 className="font-inter text-[32px] leading-[45px] text-black font-bold">{vendorInfo?.businessName}</h1>
-            <img src="/icons/vendor-1.svg" alt="" className="h-12" />
+            <img src={Vendor1} alt="" className="h-12" />
           </div>
           <h2 className="mt-7 mb-[30px] font-inter text-black font-semibold text-2xl leading-[30px]">Vendor Details</h2>
           <div className="flex justify-between">

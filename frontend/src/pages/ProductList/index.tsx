@@ -12,6 +12,11 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useLocation } from 'react-router-dom';
 
+import PlusWhiteIcon from '@/assets/icons/plus-white.svg';
+import Product1 from '@/assets/images/product-1.png';
+import TrashInactive from '@/assets/icons/trash-inactive.svg';
+import TrashActive from '@/assets/icons/trash-active.svg';
+
 const ProductList = () => {
   useEffect(() => {
     document.title = 'Products List';
@@ -104,7 +109,7 @@ const ProductList = () => {
               code="code"
             />
             <button className="bg-primary h-11 w-11 flex items-center justify-center rounded-[4px]" onClick={onOpen}>
-              <img src="/icons/plus-white.svg" alt="" />
+              <img src={PlusWhiteIcon} alt="" />
             </button>
           </div>
         </div>
@@ -123,7 +128,7 @@ const ProductList = () => {
                 <div className="contents" key={product?.code}>
                   <div className="grid products-list-columns w-full">
                     <div className="flex items-center py-[30px]">
-                      <img src="/images/product-1.png" alt="" className="w-[70px] rounded-[5px]" />
+                      <img src={Product1} alt="" className="w-[70px] rounded-[5px]" />
                       <div className="leading-6 ml-5">
                         <Link
                           className="text-lg font-inter font-semibold text-black hover:text-primary hover:underline hover:underline-offset-2"
@@ -160,8 +165,8 @@ const ProductList = () => {
                         }}
                         className="relative h-5 w-4 ml-4 trash-selector cursor-pointer"
                       >
-                        <img src="/icons/trash-inactive.svg" alt="" className="absolute trash-inactive" />
-                        <img src="/icons/trash-active.svg" alt="" className="absolute trash-active" />
+                        <img src={TrashInactive} alt="" className="absolute trash-inactive" />
+                        <img src={TrashActive} alt="" className="absolute trash-active" />
                       </div>
                     </div>
                   </div>
@@ -173,9 +178,11 @@ const ProductList = () => {
             <p className="text-center py-4 font-inter font-medium">No product added</p>
           )}
         </div>
-        <div className="mt-7 flex items-center justify-center">
-          <Pagination totalPages={productList?.totalPages} />
-        </div>
+        {productList && (
+          <div className="mt-7 flex items-center justify-center">
+            <Pagination totalPages={productList?.totalPages} />
+          </div>
+        )}
       </div>
     </>
   );

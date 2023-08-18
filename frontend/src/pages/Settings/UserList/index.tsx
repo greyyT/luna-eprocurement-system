@@ -12,6 +12,8 @@ import { toast } from 'react-hot-toast';
 import { deleteUserFromEntity } from '@/api/entity';
 import { useLocation } from 'react-router-dom';
 
+import UserPortrait from '@/assets/images/user-portrait.png';
+
 const UserList = () => {
   useEffect(() => {
     document.title = 'User List';
@@ -88,7 +90,7 @@ const UserList = () => {
             return (
               <div key={member?.email} className="contents">
                 <div className="flex gap-[18px] h-20 items-center">
-                  <img src="/images/user-portrait.png" alt="" className="w-[46px]" />
+                  <img src={UserPortrait} alt="" className="w-[46px]" />
                   <div className="text-sm leading-5 font-inter">
                     <h3 className="text-black font-medium">{member?.username}</h3>
                     <p className="text-mainText">{member?.email}</p>

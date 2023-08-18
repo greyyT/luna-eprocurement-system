@@ -30,6 +30,8 @@ const AddPriceModal: React.FC<AddPriceModalProps> = ({ isOpen, onClose, hasTrans
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = async () => {
+    if (isLoading) return;
+
     const toastLoading = toast.loading('Adding vendor and price...');
     setIsLoading(true);
 

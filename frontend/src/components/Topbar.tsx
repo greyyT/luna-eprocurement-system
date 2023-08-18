@@ -1,6 +1,8 @@
 import useCurrentUser from '@/hooks/useCurrentUser';
 import useToken from '@/hooks/useToken';
 
+import UserPortrait from '@/assets/images/user-portrait.png';
+
 const Topbar = () => {
   const { token } = useToken();
   const { data: user } = useCurrentUser(token);
@@ -13,7 +15,7 @@ const Topbar = () => {
             <h3 className="text-black font-inter text-sm leading-5 font-medium">{user?.username}</h3>
             <p className="font-inter text-xs leading-[14px] text-mainText uppercase">{user?.role}</p>
           </div>
-          <img src="/images/user-portrait.png" alt="" className="w-[46px]" />
+          <img src={UserPortrait} alt="" className="w-[46px]" />
         </div>
       </div>
       <div className="line"></div>

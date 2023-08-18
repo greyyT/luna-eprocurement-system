@@ -1,27 +1,12 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-from passlib.hash import bcrypt
+from passlib.hash import sha256_crypt
 import jwt
 
-from app.database import user_collection
 from app.auth import JWTBearer, decode_jwt
-import app.schema as schema
-
-def handle_create_user(req: schema.User.Create):
-    user = user_collection.insert_one({
-        "email": req.email,
-        "username": req.username,
-        "password": bcrypt.hash(req.password),
-        "role": None,
-        "legalEntityCode": None,
-        "departmentCode": None,
-        "teamCode": None
-    })
-    
-    return user
 
 def verify_password(password: str, hashed_password: str):
-    return bcrypt.verify(password, hashed_password)
+    return sha256_crypt.verify(password, hashed_password)
 
 async def get_email_from_token(
     credentials: HTTPAuthorizationCredentials = Depends(JWTBearer())

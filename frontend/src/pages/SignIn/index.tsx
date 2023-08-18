@@ -44,7 +44,13 @@ const SignIn = () => {
       return;
     }
 
+    setLoading(true);
+    const toastLoading = toast.loading('Signing in...');
+
     const accessToken = await signIn(email, password, setError);
+
+    setLoading(false);
+    toast.dismiss(toastLoading);
 
     if (accessToken) {
       setToken(accessToken);
@@ -52,8 +58,6 @@ const SignIn = () => {
     } else {
       toast.error('Something went wrong');
     }
-
-    setLoading(false);
   };
 
   return (
