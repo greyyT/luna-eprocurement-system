@@ -6,7 +6,8 @@ from app.database import (
     user_collection,
     department_collection,
     team_collection,
-    product_collection
+    product_collection,
+    project_collection
 )
 from app.auth import JWTBearer
 
@@ -32,6 +33,15 @@ def delete_department(departmentCode: str = Path(...)):
     department_collection.delete_one({"code": departmentCode})
     
     return JSONResponse(status_code=200, content={"message": "Department deleted successfully"})
+
+@router.delete('/api/project/{projectCode}', dependencies=[Depends(JWTBearer())], tags=['project'])
+def delete_project(projectCode: str = Path(...)):
+    project = project_collection.delete_one({"code": projectCode})
+    
+    if not project:
+        return JSONResponse(status_code=500, content={"message": "Error deleting project"})
+    
+    return JSONResponse(status_code=200, content={"message": "Project deleted successfully"})
 
 @router.delete('/api/{legalEntityCode}/{userEmail}', dependencies=[Depends(JWTBearer())], tags=['entity'])
 def delete_user_from_entity(

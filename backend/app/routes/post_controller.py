@@ -11,7 +11,8 @@ from app.database import (
     product_collection,
     vendor_collection,
     price_collection,
-    contact_collection
+    contact_collection,
+    project_collection
 )
 
 from app.auth import JWTBearer
@@ -244,3 +245,35 @@ def add_contact(req: schema.Vendor.AddContact = Body(...), vendorCode = Path(...
         return JSONResponse(status_code=500, content={"message": "Error adding contact"})
     
     return JSONResponse(status_code=200, content={"message": "Contact added successfully"})
+
+@router.post('/api/project', dependencies=[Depends(JWTBearer())], tags=['project'])
+def create_project(req: schema.Project.Create = Body(...)):
+    project = project_collection.insert_one(serializer.project.create(req))
+    
+    if not project:
+        return JSONResponse(status_code=500, content={"message": "Error creating project"})
+    
+    return JSONResponse(status_code=200, content={"message": "Project created successfully"})
+
+@router.post('/api/project/{projectCode}/markDefault', dependencies=[Depends(JWTBearer())], tags=['project'])
+def mark_project_default(projectCode: str = Path(...)):
+    project_collection.update_one(
+        {"isDefault": True},
+        {"$set": {
+            "isDefault": False
+        }}
+    )
+    
+    default_project = project_collection.update_one(
+        {"code": projectCode},
+        {"$set": {
+            "isDefault": True
+        }}
+    )
+    
+    if default_project.matched_count == 0:
+        return JSONResponse(status_code=404, content={"message": "Project not found"})
+    elif default_project.modified_count == 0:
+        return JSONResponse(status_code=500, content={"message": "Error marking project default"})
+    
+    return JSONResponse(status_code=200, content={"message": "Project marked default successfully"})

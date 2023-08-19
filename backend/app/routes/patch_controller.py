@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Body
 from fastapi.responses import JSONResponse
 
+import app.schema as schema
 from app.database import (
     entity_collection,
-    price_collection
+    price_collection,
+    project_collection
 )
 from app.auth import JWTBearer
 
@@ -34,3 +36,19 @@ def update_price(
         return JSONResponse(status_code=500, content={"message": "Error updating price"})
     
     return JSONResponse(status_code=200, content={"message": "Price updated successfully"})
+
+@router.patch('/api/project/{projectCode}', dependencies=[Depends(JWTBearer())], tags=['project'])
+def update_project_name(req: schema.Project.PatchName = Body(...), projectCode: str = Path(...)):
+    project = project_collection.update_one(
+        {"code": projectCode},
+        {"$set": {
+            "name": req.name
+        }}
+    )
+    
+    if project.matched_count == 0:
+        return JSONResponse(status_code=404, content={"message": "Project not found"})
+    elif project.modified_count == 0:
+        return JSONResponse(status_code=500, content={"message": "Error updating project"})
+    
+    return JSONResponse(status_code=200, content={"message": "Project updated successfully"})
