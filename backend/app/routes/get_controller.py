@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 import app.serializers as serializer
 
-from app.database import user_collection, entity_collection, product_collection, vendor_collection
+from app.database import user_collection, entity_collection, product_collection, vendor_collection, project_collection
 from app.auth import JWTBearer
 from app.services import get_email_from_token
 
@@ -116,3 +116,21 @@ def get_vendor_info(vendorCode: str = Path(...)):
         return JSONResponse(status_code=404, content={"message": "Vendor not found"})
     
     return serializer.vendor.vendorResponse(vendor)
+
+@router.get('/api/project/legalEntity/{legalEntityCode}', dependencies=[Depends(JWTBearer())], tags=['project'])
+def get_projects_from_entity(legalEntityCode: str = Path(...)):
+    projects = project_collection.find({"legalEntityCode": legalEntityCode})
+    
+    if not projects:
+        return JSONResponse(status_code=500, content={"message": "Error getting projects"})
+    
+    return serializer.project.projectsResponse(projects)
+
+@router.get('/api/project/{projectCode}', dependencies=[Depends(JWTBearer())], tags=['project'])
+def get_project_info(projectCode: str = Path(...)):
+    project = project_collection.find_one({"code": projectCode})
+    
+    if not project:
+        return JSONResponse(status_code=404, content={"message": "Project not found"})
+    
+    return serializer.project.projectResponse(project)

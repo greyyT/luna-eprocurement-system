@@ -28,3 +28,6 @@ vendor_collection.create_index("code", unique=True)
 price_collection = db["Price"]
 
 contact_collection = db["Contact"]
+
+project_collection = db["Project"]
+project_collection.create_index("code", unique=True)
