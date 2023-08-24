@@ -1,15 +1,16 @@
-import { createDepartment, createTeam, deleteDepartment } from '@/api/entity';
+import { createDepartment, createTeam } from '@/api/entity';
 import AddTeamModal from '@/components/modals/AddTeamModal';
 import ActionButton from '@/components/ui/ActionButton';
 import { useCurrentEntity } from '@/hooks/useCurrentEntity';
 import { useModal } from '@/hooks/useModal';
 import useMountTransition from '@/hooks/useMountTransition';
 import useToken from '@/hooks/useToken';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 
 import PlusCircle from '@/assets/icons/plus-circle.svg';
+import axiosInstance from '@/api/axios';
 
 const Teams = () => {
   useEffect(() => {
@@ -32,22 +33,29 @@ const Teams = () => {
   const onOpen = useModal((state) => state.onOpen);
   const hasTransitionedIn = useMountTransition(isOpen, 200);
 
-  const onDelete = async (code: string) => {
-    setLoading(true);
-    const toastLoading = toast.loading('Deleting department...');
+  const onDelete = useCallback(
+    async (departmentCode: string) => {
+      if (loading) return;
 
-    const response = await deleteDepartment(token, code);
-
-    toast.dismiss(toastLoading);
-    setLoading(false);
-
-    if (!response) {
-      toast.error('Something went wrong');
-      return;
-    }
-
-    toast.success('Department deleted successfully');
-  };
+      setLoading(true);
+      const toastLoading = toast.loading('Deleting department...');
+      try {
+        await axiosInstance.delete(`/api/department/${departmentCode}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success('Department deleted successfully');
+        mutate();
+      } catch (error) {
+        toast.error('Something went wrong');
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastLoading);
+      }
+    },
+    [mutate, token, loading],
+  );
 
   return (
     <>
