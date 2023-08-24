@@ -7,7 +7,8 @@ from app.database import (
     department_collection,
     team_collection,
     product_collection,
-    project_collection
+    project_collection,
+    price_collection
 )
 from app.auth import JWTBearer
 
@@ -77,6 +78,8 @@ def delete_product(legalEntityCode: str = Path(...), productCode: str = Path(...
     
     if not entity:
         return JSONResponse(status_code=404, content={"message": "Entity not found"})
+    
+    price_collection.delete_many({"productCode": productCode})
     
     product = product_collection.delete_one({"legalEntityCode": legalEntityCode, "code": productCode})
     

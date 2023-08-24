@@ -118,13 +118,19 @@ def get_vendor_info(vendorCode: str = Path(...)):
     return serializer.vendor.vendorResponse(vendor)
 
 @router.get('/api/project/legalEntity/{legalEntityCode}', dependencies=[Depends(JWTBearer())], tags=['project'])
-def get_projects_from_entity(legalEntityCode: str = Path(...)):
+def get_projects_from_entity(legalEntityCode: str = Path(...), page: int = Query(1), size: int = Query(3)):
     projects = project_collection.find({"legalEntityCode": legalEntityCode})
     
     if not projects:
         return JSONResponse(status_code=500, content={"message": "Error getting projects"})
     
-    return serializer.project.projectsResponse(projects)
+    return {
+        "data": serializer.project.projectsResponse(projects.skip((page - 1) * size).limit(size)),
+        "currentPage": page,
+        "size": size,
+        "totalPages": projects.count() / size if projects.count() % size == 0 else (projects.count() // size + 1),
+        "totalElements": projects.count(),
+    }
 
 @router.get('/api/project/{projectCode}', dependencies=[Depends(JWTBearer())], tags=['project'])
 def get_project_info(projectCode: str = Path(...)):
