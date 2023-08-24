@@ -1,4 +1,4 @@
-import { patchrPrice } from '@/api/entity';
+import axiosInstance from '@/api/axios';
 import ActionButton from '@/components/ui/ActionButton';
 import useToken from '@/hooks/useToken';
 import { useState } from 'react';
@@ -28,22 +28,28 @@ const EditVendor: React.FC<EditVendorProps> = ({ name, price, vendorCode, mutate
   const [error, setError] = useState<string>('');
 
   const onSubmit = async () => {
+    if (loading) return;
+
     setLoading(true);
     const toastLoading = toast.loading('Updating price...');
-
-    const response = await patchrPrice(token, entityCode, productCode, vendorCode, editPrice);
-
-    setLoading(false);
-    toast.dismiss(toastLoading);
-
-    if (!response) {
+    try {
+      await axiosInstance.patch(
+        `/api/product/${entityCode}/${productCode}/${vendorCode}/${editPrice}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      toast.success('Price updated successfully');
+      mutate();
+    } catch (error) {
       toast.error('Something went wrong');
-      return;
+    } finally {
+      setLoading(false);
+      toast.dismiss(toastLoading);
     }
-
-    toast.success('Price updated successfully');
-    mutate();
-    setEdit(false);
   };
 
   const onCancel = () => {

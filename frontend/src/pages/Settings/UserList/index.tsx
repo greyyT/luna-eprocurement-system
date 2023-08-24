@@ -9,10 +9,11 @@ import EditUserModal from '@/components/modals/EditUserModal';
 import { useModal } from '@/hooks/useModal';
 import useMountTransition from '@/hooks/useMountTransition';
 import { toast } from 'react-hot-toast';
-import { deleteUserFromEntity } from '@/api/entity';
 import { useLocation } from 'react-router-dom';
 
 import UserPortrait from '@/assets/images/user-portrait.png';
+import axiosInstance from '@/api/axios';
+import ConfirmationModal from '@/components/modals/ConfirmationModal';
 
 const UserList = () => {
   useEffect(() => {
@@ -27,6 +28,10 @@ const UserList = () => {
   const onOpen = useModal((state) => state.onOpen);
   const setData = useModal((state) => state.setData);
   const hasTransitionedIn = useMountTransition(isOpen, 200);
+
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('');
+  const confirmationModalTransition = useMountTransition(isConfirmationOpen, 200);
 
   const { token } = useToken();
   const legalEntityCode = params.get('entityCode');
@@ -46,26 +51,40 @@ const UserList = () => {
 
   const onDelete = useCallback(
     async (email: string) => {
+      if (loading) return;
+
       setLoading(true);
       const toastLoading = toast.loading('Deleting user...');
-
-      const response = await deleteUserFromEntity(token, email, legalEntityCode || '');
-
-      setLoading(false);
-      toast.dismiss(toastLoading);
-
-      if (!response) {
+      try {
+        await axiosInstance.delete(`/api/${legalEntityCode}/${email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success('User deleted successfully');
+        mutate();
+      } catch (error) {
         toast.error('Something went wrong');
+      } finally {
+        setLoading(false);
+        toast.dismiss(toastLoading);
+        setIsConfirmationOpen(false);
       }
-
-      toast.success('User deleted successfully');
-      mutate();
     },
-    [legalEntityCode, mutate, token],
+    [legalEntityCode, mutate, token, loading],
   );
 
   return (
     <>
+      <ConfirmationModal
+        isOpen={isConfirmationOpen}
+        onClose={() => setIsConfirmationOpen(false)}
+        onConfirm={() => onDelete(email)}
+        hasTransitionedIn={confirmationModalTransition}
+        isLoading={loading}
+        header="Are you sure?"
+        description="This will permanently delete the user from the entity."
+      />
       <EditUserModal
         entityInfo={entityInfo}
         isOpen={isOpen}
@@ -112,7 +131,14 @@ const UserList = () => {
                       setData(member);
                     }}
                   />
-                  <ActionButton isLoading={loading} type="delete" onClick={() => onDelete(member?.email)} />
+                  <ActionButton
+                    isLoading={loading}
+                    type="delete"
+                    onClick={() => {
+                      setEmail(member?.email);
+                      setIsConfirmationOpen(true);
+                    }}
+                  />
                 </div>
               </div>
             );

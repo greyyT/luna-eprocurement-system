@@ -1,4 +1,7 @@
-import { deleteProduct } from '@/api/entity';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { Link, useLocation } from 'react-router-dom';
+
 import { searchProduct } from '@/api/search';
 import AddProductModal from '@/components/modals/AddProductModal';
 import ConfirmationModal from '@/components/modals/ConfirmationModal';
@@ -8,14 +11,12 @@ import { useModal } from '@/hooks/useModal';
 import useMountTransition from '@/hooks/useMountTransition';
 import useProductList from '@/hooks/useProductList';
 import useToken from '@/hooks/useToken';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { Link, useLocation } from 'react-router-dom';
 
 import PlusWhiteIcon from '@/assets/icons/plus-white.svg';
 import Product1 from '@/assets/images/product-1.png';
 import TrashInactive from '@/assets/icons/trash-inactive.svg';
 import TrashActive from '@/assets/icons/trash-active.svg';
+import axiosInstance from '@/api/axios';
 
 const ProductList = () => {
   useEffect(() => {
@@ -66,18 +67,21 @@ const ProductList = () => {
     const toastLoading = toast.loading('Deleting product...');
     setIsLoading(true);
 
-    const response = await deleteProduct(token, productCode);
-
-    setIsLoading(false);
-    toast.dismiss(toastLoading);
-
-    if (!response) {
-      toast.error('Something went wrong');
-      return;
+    try {
+      await axiosInstance.delete(`/api/product/${entityCode}/${productCode}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success('Product deleted successfully');
+      mutate();
+      setIsConfirmationOpen(false);
+    } catch (error) {
+      toast.error('Failed to delete product');
+    } finally {
+      setIsLoading(false);
+      toast.dismiss(toastLoading);
     }
-
-    toast.success('Product deleted successfully');
-    mutate();
   };
 
   return (
@@ -88,6 +92,8 @@ const ProductList = () => {
         hasTransitionedIn={confirmationTransition}
         onConfirm={onDeleteProduct}
         isLoading={isLoading}
+        header={'Are you sure?'}
+        description="This will permanently delete the product."
       />
       <AddProductModal isOpen={isOpen} onClose={onClose} hasTransitionedIn={productTransition} mutate={mutate} />
       <div className="pl-10 pr-18 pt-7">

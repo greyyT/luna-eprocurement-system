@@ -9,6 +9,8 @@ interface ConfirmationModalProps {
   hasTransitionedIn: boolean;
   onConfirm: () => void;
   isLoading: boolean;
+  header: string;
+  description: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -17,6 +19,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   hasTransitionedIn,
   onConfirm,
   isLoading,
+  header,
+  description,
 }) => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -29,8 +33,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} hasTransitionedIn={hasTransitionedIn} isLoading={isLoading}>
       <div className="p-6 bg-white w-[500px] rounded-lg relative" onClick={(ev) => ev.stopPropagation()}>
-        <h1 className="font-inter font-semibold text-lg">Are you sure?</h1>
-        <p className="font-inter text-sm">This action cannot be undone</p>
+        <h1 className="font-inter font-semibold text-lg">{header}</h1>
+        <p className="font-inter text-sm">{description}</p>
         <img src={CloseIcon} className="h-4 cursor-pointer absolute top-6 right-6" alt="" onClick={onClose} />
         <div className="flex items-center justify-end mt-10 gap-4">
           <button
