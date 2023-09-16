@@ -54,6 +54,7 @@ const SignIn = () => {
 
     if (accessToken) {
       setToken(accessToken);
+      toast.success('User signed in successfully');
       navigate('/');
     } else {
       toast.error('Something went wrong');
