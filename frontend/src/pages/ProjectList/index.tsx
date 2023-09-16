@@ -1,19 +1,20 @@
-import SearchBox from '@/components/ui/SearchBox';
 import { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+
+import axiosInstance from '@/api/axios';
+import { useModal } from '@/hooks/useModal';
+import useProjectList from '@/hooks/useProjectList';
+import useMountTransition from '@/hooks/useMountTransition';
+import useToken from '@/hooks/useToken';
+import AddProjectModal from '@/components/modals/AddProjectModal';
+import SearchBox from '@/components/ui/SearchBox';
+import ConfirmationModal from '@/components/modals/ConfirmationModal';
 
 import PlusIcon from '@/assets/icons/plus-white.svg';
 import TrashActive from '@/assets/icons/trash-active.svg';
 import TrashInactive from '@/assets/icons/trash-inactive.svg';
 import EditIcon from '@/assets/icons/edit.svg';
-import { useModal } from '@/hooks/useModal';
-import useMountTransition from '@/hooks/useMountTransition';
-import AddProjectModal from '@/components/modals/AddProjectModal';
-import useToken from '@/hooks/useToken';
-import { useLocation } from 'react-router-dom';
-import useProjectList from '@/hooks/useProjectList';
-import { toast } from 'react-hot-toast';
-import axiosInstance from '@/api/axios';
-import ConfirmationModal from '@/components/modals/ConfirmationModal';
 
 const ProjectList = () => {
   useEffect(() => {

@@ -4,7 +4,7 @@ const useMountTransition = (isMounted: boolean, duration: number): boolean => {
   const [hasTransitionedIn, setHasTransitionedIn] = useState<boolean>(false);
 
   useEffect(() => {
-    let timeoutId: number;
+    let timeoutId: NodeJS.Timeout;
 
     if (isMounted && !hasTransitionedIn) {
       setHasTransitionedIn(true);
