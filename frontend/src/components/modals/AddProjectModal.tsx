@@ -83,15 +83,17 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose, hasT
         });
         toast.success('Project added successfully');
       } else {
-        await axiosInstance.patch(
-          `/api/project/${data?.projectCode.code}`,
-          { name },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
+        if (name !== data?.name) {
+          await axiosInstance.patch(
+            `/api/project/${data?.projectCode.code}`,
+            { name },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          },
-        );
+          );
+        }
         if (checked) {
           await axiosInstance.post(
             `/api/project/${data?.projectCode.code}/markDefault`,
@@ -108,7 +110,8 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose, hasT
       onClose();
       mutate();
     } catch (error) {
-      toast.error('Failed to add project');
+      if (variant === 'add') toast.error('Failed to add project');
+      else toast.error('Failed to update project');
     } finally {
       setLoading(false);
       toast.dismiss(toastLoading);
@@ -136,10 +139,12 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose, hasT
             className="cursor-pointer p-2 hover:"
           />
         </div>
-        <div className="flex gap-2 items-center">
-          <h2 className="font-inter text-sm">Mark this project as default</h2>
-          <SwitchButton checked={checked} onChange={() => setChecked(!checked)} />
-        </div>
+        {variant === 'edit' && (
+          <div className="flex gap-2 items-center">
+            <h2 className="font-inter text-sm">Mark this project as default</h2>
+            <SwitchButton disable={data?.isDefault} checked={checked} onChange={() => setChecked(!checked)} />
+          </div>
+        )}
         <div className="mt-7 flex flex-col gap-5">
           <input
             type="text"
