@@ -8,6 +8,7 @@ import BoxIcon from '@/assets/icons/box.svg';
 import SettingsIcon from '@/assets/icons/settings.svg';
 import LogoutIcon from '@/assets/icons/logout.svg';
 import LunarIcon from '@/assets/icons/lunar-client.svg';
+import CartIcon from '@/assets/icons/cart.svg';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -40,6 +41,18 @@ const Sidebar = () => {
         >
           <img src={HomeIcon} alt="" className="w-[18px]" />
           <p className="font-inter leading-6 text-mainText">Home</p>
+        </NavLink>
+        <NavLink
+          to={`/purchase-requistion?entityCode=${entityCode}`}
+          className={({ isActive }) =>
+            (isActive
+              ? 'bg-[#F4F7FF] before:absolute before:w-[3px] before:h-full before:right-0 before:bg-primary '
+              : 'hover:bg-[#F4F7FF] hover:before:absolute hover:before:w-[3px] hover:before:h-full hover:before:right-0 hover:before:bg-primary ') +
+            'relative flex h-[42px] gap-[10px] px-10 items-center'
+          }
+        >
+          <img src={CartIcon} alt="" className="w-[18px]" />
+          <p className="font-inter leading-6 text-mainText">Purchase Requisition</p>
         </NavLink>
         <NavLink
           to={`/projects?entityCode=${entityCode}`}

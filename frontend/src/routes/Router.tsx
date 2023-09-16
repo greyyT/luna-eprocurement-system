@@ -19,6 +19,7 @@ import VendorList from '@/pages/VendorList';
 import ProductInfo from '@/pages/ProductList/[ProductInfo]';
 import VendorInfo from '@/pages/VendorList/[VendorInfo]';
 import ProjectList from '@/pages/ProjectList';
+import PurchaseRequisition from '@/pages/PurchaseRequisition';
 
 export const Router = () => {
   return (
@@ -62,6 +63,14 @@ export const Router = () => {
             <EntityLayout>
               <JoinEntity />
             </EntityLayout>
+          }
+        />
+        <Route
+          path="/purchase-requistion"
+          element={
+            <DefaultLayout>
+              <PurchaseRequisition />
+            </DefaultLayout>
           }
         />
         <Route
