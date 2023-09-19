@@ -160,6 +160,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose, hasT
               <input
                 type="text"
                 placeholder="Project label"
+                readOnly={loading}
                 className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
                   loading ? 'cursor-not-allowed opacity-80' : ''
                 }`}
@@ -169,6 +170,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose, hasT
               <input
                 type="text"
                 placeholder="Project code"
+                readOnly={loading}
                 className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
                   loading ? 'cursor-not-allowed opacity-80' : ''
                 }`}
@@ -178,6 +180,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ isOpen, onClose, hasT
               <input
                 type="text"
                 placeholder="Purchase Allowance"
+                readOnly={loading}
                 className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
                   loading ? 'cursor-not-allowed opacity-80' : ''
                 }`}

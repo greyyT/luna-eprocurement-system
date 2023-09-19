@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import ArrowIcon from '@/assets/icons/arrow.svg';
 
 interface PaginationProps {
   totalPages: number;
+  defaultPage?: number;
 }
 
-const Pagination: React.FC<PaginationProps> = React.memo(({ totalPages }) => {
+const Pagination: React.FC<PaginationProps> = React.memo(({ totalPages, defaultPage }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const pages: number[] = [];
+
+  useEffect(() => {
+    if (defaultPage) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set('page', defaultPage.toString());
+      setSearchParams(newSearchParams);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentPage = searchParams.get('page') || 1;
 

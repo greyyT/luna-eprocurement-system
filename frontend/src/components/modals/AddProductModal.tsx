@@ -132,7 +132,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, hasT
   return (
     <Modal isOpen={isOpen} onClose={onClose} hasTransitionedIn={hasTransitionedIn} isLoading={loading}>
       <div
-        className="w-[939px] max-h-[80vh] bg-white rounded-lg py-12 pl-14 pr-11 overflow-y-scroll"
+        className="w-[939px] max-h-[80vh] bg-white rounded-lg py-12 pl-14 pr-11 overflow-y-auto"
         onClick={(ev) => ev.stopPropagation()}
       >
         <div className="flex justify-between w-full">
