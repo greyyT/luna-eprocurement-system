@@ -18,7 +18,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ search, setSearch, searchResult, 
     <div className="relative">
       <input
         type="text"
-        className="outline-none h-full w-[385px] rounded-lg border border-solid border-gray-300 px-12 font-inter leading-6 placeholder:text-[#637381] placeholder:opacity-50"
+        className="outline-none h-full w-[385px] rounded-lg border border-solid border-gray-300 pl-12 pr-2 font-inter leading-6 placeholder:text-[#637381] placeholder:opacity-50"
         placeholder={placeholder}
         value={search}
         onChange={(ev) => setSearch(ev.target.value)}

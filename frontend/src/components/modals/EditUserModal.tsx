@@ -55,7 +55,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClo
       options: entityInfo?.departments || [],
       code: 'departmentCode',
       name: 'departmentName',
-      alt: 'Choose Department',
+      alt: '-- Choose Department --',
+      noItemPlaceholder: 'No department available',
     },
     {
       selected: !department?.departmentCode ? false : team,
@@ -65,14 +66,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClo
         entityInfo?.departments.find((depart: any) => depart.departmentCode === department?.departmentCode)?.teams,
       code: 'teamCode',
       name: 'teamName',
-      alt: 'Choose Team',
+      alt: '-- Choose Team --',
+      noItemPlaceholder: 'No team available',
     },
     {
       selected: role,
       setSelected: setRole,
       options: ROLE_LIST.filter((item) => item !== role),
       code: '',
-      alt: 'Choose Role',
+      alt: '-- Choose Role --',
+      noItemPlaceholder: 'No role available',
     },
   ];
 
@@ -159,6 +162,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClo
                 setSelected={selectBox.setSelected}
                 alt={selectBox.alt}
                 isLoading={loading}
+                noItemPlaceholder={selectBox.noItemPlaceholder}
               />
             </div>
           ))}

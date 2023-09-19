@@ -12,11 +12,13 @@ interface SelectBoxProps {
   code?: string;
   name?: string;
   alt: string;
+  noItemPlaceholder: string;
   isLoading: boolean;
+  variant?: 'user' | 'purchase';
 }
 
 const SelectBox: React.FC<SelectBoxProps> = React.memo(
-  ({ options, selected, setSelected, code, name, alt, isLoading }) => {
+  ({ options, selected, setSelected, code, name, alt, isLoading, noItemPlaceholder, variant }) => {
     const closable = useModal((state) => state.closable);
     const setClosable = useModal((state) => state.setClosable);
 
@@ -27,9 +29,9 @@ const SelectBox: React.FC<SelectBoxProps> = React.memo(
 
     useEffect(() => {
       if (code) {
-        setNewOptions(options?.filter((option: any) => option?.[code] !== selected?.[code]).sort());
+        setNewOptions(options?.filter((option: any) => option?.[code] !== selected?.[code]));
       } else {
-        setNewOptions(options?.filter((option: any) => option !== selected).sort());
+        setNewOptions(options?.filter((option: any) => option !== selected));
       }
     }, [selected, options, code]);
 
@@ -41,37 +43,56 @@ const SelectBox: React.FC<SelectBoxProps> = React.memo(
 
     const onClick = useCallback(
       (ev: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        if (isLoading) return;
         ev.stopPropagation();
         setClosable(active);
         setActive(!active);
       },
-      [active, setClosable],
+      [active, setClosable, isLoading],
     );
 
     return (
       <button
         onClick={onClick}
-        className={`w-[500px] flex items-center py-3 px-5 relative border border-solid rounded-[5px] 
+        className={`w-full flex items-center ${
+          variant === 'purchase' ? 'py-[15px] px-[14px]' : 'py-3 px-5'
+        }  relative border border-solid rounded-[5px] 
         ${isLoading ? 'opacity-80 cursor-not-allowed' : ''} 
-        ${selected === false ? 'opacity-30 pointer-events-none' : active ? 'border-primary' : 'border-gray-100'}`}
+        ${
+          selected === false
+            ? 'opacity-30 pointer-events-none'
+            : active
+            ? 'border-primary'
+            : variant === 'purchase'
+            ? 'border-[#F0F0F0]'
+            : 'border-gray-100'
+        }`}
       >
         <div className="flex justify-between w-full">
-          <p className={`font-inter font-medium leading-6 pointer ${active ? 'text-primary' : ' text-black'}`}>
+          <p
+            className={`font-inter ${variant === 'purchase' ? 'text-[15px] leading-5' : 'leading-6 font-medium'} ${
+              active ? 'text-primary' : variant === 'purchase' ? 'text-mainText' : 'text-black'
+            }`}
+          >
             {typeof selected !== 'object'
               ? selected
                 ? selected
-                : `-- ${alt} --`
+                : `${alt}`
               : name && selected?.[name]
               ? selected?.[name]
-              : `-- ${alt} --`}
+              : `${alt}`}
           </p>
-          <img src={active ? ArrowActive : ArrowInactive} alt="" />
+          <img
+            src={active ? ArrowActive : ArrowInactive}
+            alt=""
+            className={`${variant === 'purchase' ? 'opacity-60' : ''}`}
+          />
         </div>
         {selected !== false && (active || hasTransitionedIn) && (
           <div className={`select-box ${hasTransitionedIn && 'in'} ${active && 'visible'}`}>
             {!newOptions || newOptions?.length === 0 ? (
               <div className="py-2 text-center pl-5 w-full text-black font-inter font-semibold leading-6">
-                -- No item available --
+                {noItemPlaceholder}
               </div>
             ) : (
               newOptions?.map((option: any) => {
