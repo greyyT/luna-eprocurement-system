@@ -1,139 +1,154 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { Suspense } from 'react';
 
-import AuthLayout from '@/layouts/AuthLayout';
 import DefaultLayout from '@/layouts/DefaultLayout';
-import EntityLayout from '@/layouts/EntityLayout';
+
+const AuthLayout = React.lazy(() => import('@/layouts/AuthLayout'));
+const EntityLayout = React.lazy(() => import('@/layouts/EntityLayout'));
 
 import SignIn from '@/pages/SignIn';
 import SignUp from '@/pages/SignUp';
 import CreateEntity from '@/pages/CreateEntity';
 import JoinEntity from '@/pages/JoinEntity';
-import Home from '@/pages/Home';
-import Settings from '@/pages/Settings';
-import UserList from '@/pages/Settings/UserList';
-import Teams from '@/pages/Settings/Teams';
 import EntityError from '@/pages/EntityError';
-import ConfigureRoles from '@/pages/Settings/ConfigureRoles';
-import ProductList from '@/pages/ProductList';
-import VendorList from '@/pages/VendorList';
-import ProductInfo from '@/pages/ProductList/[ProductInfo]';
-import VendorInfo from '@/pages/VendorList/[VendorInfo]';
-import ProjectList from '@/pages/ProjectList';
-import PurchaseRequisition from '@/pages/PurchaseRequisition';
+
+import InfoModalLayout from '@/layouts/InfoModalLayout';
+
+const Home = React.lazy(() => import('@/pages/Home'));
+const Settings = React.lazy(() => import('@/pages/Settings'));
+const UserList = React.lazy(() => import('@/pages/Settings/UserList'));
+const Teams = React.lazy(() => import('@/pages/Settings/Teams'));
+const ConfigureRoles = React.lazy(() => import('@/pages/Settings/ConfigureRoles'));
+const ProductList = React.lazy(() => import('@/pages/ProductList'));
+const VendorList = React.lazy(() => import('@/pages/VendorList'));
+const ProductInfo = React.lazy(() => import('@/pages/ProductList/[ProductInfo]'));
+const VendorInfo = React.lazy(() => import('@/pages/VendorList/[VendorInfo]'));
+const ProjectList = React.lazy(() => import('@/pages/ProjectList'));
+const PurchaseRequisition = React.lazy(() => import('@/pages/PurchaseRequisition'));
 
 export const Router = () => {
   return (
-    <BrowserRouter basename={import.meta.env.DEV ? '/' : '/lunar-eprocurement-system/'}>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <DefaultLayout>
-              <Home />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/sign-in"
-          element={
-            <AuthLayout>
-              <SignIn />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path="/sign-up"
-          element={
-            <AuthLayout>
-              <SignUp />
-            </AuthLayout>
-          }
-        />
-        <Route
-          path="/create-entity"
-          element={
-            <EntityLayout>
-              <CreateEntity />
-            </EntityLayout>
-          }
-        />
-        <Route
-          path="/join-entity"
-          element={
-            <EntityLayout>
-              <JoinEntity />
-            </EntityLayout>
-          }
-        />
-        <Route
-          path="/purchase-requistion"
-          element={
-            <DefaultLayout>
-              <PurchaseRequisition />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/projects"
-          element={
-            <DefaultLayout>
-              <ProjectList />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/products"
-          element={
-            <DefaultLayout>
-              <ProductList />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/products/:productCode"
-          element={
-            <DefaultLayout>
-              <ProductInfo />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/vendors"
-          element={
-            <DefaultLayout>
-              <VendorList />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/vendors/:vendorCode"
-          element={
-            <DefaultLayout>
-              <VendorInfo />
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <DefaultLayout>
-              <Settings />
-            </DefaultLayout>
-          }
-        >
-          <Route path="user-list" element={<UserList />} />
-          <Route path="teams" element={<Teams />} />
-          <Route path="roles-config" element={<ConfigureRoles />} />
-        </Route>
-        <Route
-          path="/NaN"
-          element={
-            <DefaultLayout>
-              <EntityError />
-            </DefaultLayout>
-          }
-        />
-      </Routes>
+    <BrowserRouter basename={import.meta.env.DEV ? '/' : '/luna-eprocurement-system/'}>
+      <InfoModalLayout>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <DefaultLayout>
+                <Home />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/sign-in"
+            element={
+              <Suspense>
+                <AuthLayout>
+                  <SignIn />
+                </AuthLayout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/sign-up"
+            element={
+              <Suspense>
+                <AuthLayout>
+                  <SignUp />
+                </AuthLayout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/create-entity"
+            element={
+              <Suspense>
+                <EntityLayout>
+                  <CreateEntity />
+                </EntityLayout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/join-entity"
+            element={
+              <Suspense>
+                <EntityLayout>
+                  <JoinEntity />
+                </EntityLayout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/purchase-requisition"
+            element={
+              <DefaultLayout>
+                <PurchaseRequisition />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <DefaultLayout>
+                <ProjectList />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <DefaultLayout>
+                <ProductList />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/products/:productCode"
+            element={
+              <DefaultLayout>
+                <ProductInfo />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/vendors"
+            element={
+              <DefaultLayout>
+                <VendorList />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/vendors/:vendorCode"
+            element={
+              <DefaultLayout>
+                <VendorInfo />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <DefaultLayout>
+                <Settings />
+              </DefaultLayout>
+            }
+          >
+            <Route path="user-list" element={<UserList />} />
+            <Route path="teams" element={<Teams />} />
+            <Route path="roles-config" element={<ConfigureRoles />} />
+          </Route>
+          <Route
+            path="/NaN"
+            element={
+              <DefaultLayout>
+                <EntityError />
+              </DefaultLayout>
+            }
+          />
+        </Routes>
+      </InfoModalLayout>
     </BrowserRouter>
   );
 };

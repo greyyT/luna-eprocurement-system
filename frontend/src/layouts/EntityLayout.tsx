@@ -1,25 +1,20 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import useToken from '../hooks/useToken';
 import { useEffect } from 'react';
 import useCurrentUser from '@/hooks/useCurrentUser';
-import { toast } from 'react-hot-toast';
+import Loader from '@/components/ui/Loader';
 
 const EntityLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
-  const { token, deleteToken } = useToken();
-  const {  error } = useCurrentUser(token);
+  const { data: user, isLoading } = useCurrentUser();
 
   useEffect(() => {
-    if (!token) {
-      navigate('/sign-in');
+    if (user && user?.legalEntityCode !== null) {
+      navigate('/');
     }
-    if (error?.response.status === 403) {
-      toast.error("Your login session has expired. Please sign in again.")
-      deleteToken();
-      navigate('/sign-in');
-    }
-  }, [token, navigate, error, deleteToken]);
+  }, [user, navigate]);
+
+  if (isLoading) return <Loader />;
 
   return (
     <div className="bg-[#F8F8F8] h-screen w-screen flex justify-center items-center relative">

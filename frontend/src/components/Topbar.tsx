@@ -1,11 +1,9 @@
 import useCurrentUser from '@/hooks/useCurrentUser';
-import useToken from '@/hooks/useToken';
 
 import UserPortrait from '@/assets/images/user-portrait.png';
 
 const Topbar = () => {
-  const { token } = useToken();
-  const { data: user } = useCurrentUser(token);
+  const { data: user } = useCurrentUser();
 
   return (
     <>

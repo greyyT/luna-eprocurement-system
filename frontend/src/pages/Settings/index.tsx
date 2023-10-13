@@ -1,21 +1,18 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
-import useToken from '@/hooks/useToken';
 import useCurrentUser from '@/hooks/useCurrentUser';
 
 import CopyIcon from '@/assets/icons/copy.svg';
 
 const Settings = () => {
   const navigate = useNavigate();
-
-  const { token } = useToken();
-  const { data: user } = useCurrentUser(token);
+  const { data: user } = useCurrentUser();
 
   useEffect(() => {
     if (window.location.pathname.endsWith('settings')) {
-      navigate(`/settings/user-list?entityCode=${user?.legalEntityCode}`);
+      navigate(`/settings/user-list`);
     }
   }, [user, navigate]);
 
@@ -36,9 +33,9 @@ const Settings = () => {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(user.legalEntityCode);
+      await navigator.clipboard.writeText(user?.legalEntityCode || '');
       toast.success('Copied to clipboard');
-    } catch (err) {
+    } catch (error) {
       toast.error('Failed to copy');
     }
   };
@@ -78,13 +75,36 @@ const Settings = () => {
           return (
             <Link
               key={idx}
-              to={`/settings/${route.path}?entityCode=${user?.legalEntityCode}`}
-              className={
-                (window.location.pathname.includes(route.path)
-                  ? 'text-primary before:absolute before:h-[2px] before:w-full before:-bottom-[2px] before:bg-primary '
-                  : 'text-mainText hover:before:absolute hover:before:h-[2px] hover:before:w-full hover:before:-bottom-[2px] hover:before:bg-primary hover:text-primary ') +
-                'relative flex items-center justify-center w-37.5 max-w-full h-full leading-5 font-inter'
-              }
+              to={`/settings/${route.path}`}
+              className={`
+                relative
+                flex
+                items-center
+                justify-center
+                w-37.5
+                max-w-full
+                h-full
+                leading-5
+                font-inter
+                ${
+                  window.location.pathname.includes(route.path)
+                    ? `
+                      text-primary 
+                      before:absolute 
+                      before:h-[2px] 
+                      before:w-full 
+                      before:-bottom-[2px] 
+                      before:bg-primary`
+                    : `
+                      text-mainText 
+                      hover:before:absolute 
+                      hover:before:h-[2px] 
+                      hover:before:w-full 
+                      hover:before:-bottom-[2px] 
+                      hover:before:bg-primary 
+                      hover:text-primary`
+                }
+              `}
             >
               {route.content}
             </Link>
@@ -92,7 +112,9 @@ const Settings = () => {
         })}
       </div>
       <div className="line"></div>
-      <Outlet />
+      <Suspense>
+        <Outlet />
+      </Suspense>
     </div>
   );
 };

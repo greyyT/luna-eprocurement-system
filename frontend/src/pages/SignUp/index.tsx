@@ -1,11 +1,40 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 
 import Input from '@/components/ui/Input';
-import handleInput from '@/utils/validator';
-import { signIn, signUp } from '@/api/auth';
-import useToken from '@/hooks/useToken';
+import axiosInstance, { handleError } from '@/api/axios';
+import useCurrentUser from '@/hooks/useCurrentUser';
+import { AxiosError } from 'axios';
+
+const passwordSchema = z
+  .string()
+  .min(8)
+  .max(32)
+  .refine(
+    (password) => {
+      // Use regular expressions to check for at least one uppercase letter and one number
+      const uppercaseRegex = /[A-Z]/;
+      const numberRegex = /[0-9]/;
+
+      return uppercaseRegex.test(password) && numberRegex.test(password);
+    },
+    {
+      message: 'Password must have 8 to 32 characters, at least one uppercase letter, and one number',
+    },
+  );
+
+const schema = z
+  .object({
+    email: z.string().email().min(1, { message: 'Email is required' }),
+    name: z.string().min(1, { message: 'Username is required' }),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+  });
 
 const SignUp = () => {
   useEffect(() => {
@@ -13,68 +42,76 @@ const SignUp = () => {
   }, []);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const { setToken } = useToken();
-  const navigate = useNavigate();
 
-  const [email, setEmail] = useState<string>('');
-  const [name, setName] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<{ email: string; name: string; password: string }>({
+  const [formData, setFormData] = useState({
     email: '',
     name: '',
     password: '',
+    confirmPassword: '',
   });
 
-  useEffect(() => {
-    setError({ email: '', name: '', password: '' });
-  }, [email, name, password]);
+  const [error, setError] = useState({
+    email: '',
+    name: '',
+    password: '',
+    confirmPassword: '',
+  });
 
+  // Mutate the current user data after signing up
+  const { mutate } = useCurrentUser();
+
+  // Reset the error messages when the user changes the input
+  useEffect(() => {
+    setError({ email: '', name: '', password: '', confirmPassword: '' });
+  }, [formData]);
+
+  // Handle the sign up form submission
   const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
-    const emailError = handleInput(email, 'required', 'email');
+    if (loading) return;
 
-    if (emailError) {
-      setError({ ...error, email: emailError });
-      toast.error('Check your input');
-      return;
-    }
+    // Validate the input
+    const validationResult = schema.safeParse(formData);
 
-    const nameError = handleInput(name, 'required');
+    // If the input is invalid, display the first error messages
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors;
 
-    if (nameError) {
-      setError({ ...error, name: nameError });
-      toast.error('Check your input');
-      return;
-    }
-
-    const passwordError = handleInput(password, 'required', 'password');
-
-    if (passwordError) {
-      setError({ ...error, password: passwordError });
-      toast.error('Check your input');
-      return;
+      if (errors.length > 0) {
+        if (errors[0].code === 'custom') {
+          setError({ ...error, password: errors[0].message, confirmPassword: errors[0].message });
+          return;
+        } else {
+          setError({ ...error, [errors[0].path[0]]: errors[0].message });
+          return;
+        }
+      }
     }
 
     setLoading(true);
     const toastLoading = toast.loading('Signing up...');
 
-    const res = await signUp(email, name, password, setError);
-
-    if (!res) {
-      toast.error('Something went wrong');
+    try {
+      await axiosInstance.post('/auth/register', {
+        email: formData.email,
+        username: formData.name,
+        password: formData.password,
+      });
+      await axiosInstance.post('/auth/login', { email: formData.email, password: formData.password });
+      await mutate();
+      toast.success('User signed up successfully');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const message: string = handleError(error);
+        toast.error(message);
+      } else {
+        toast.error('Something went wrong');
+      }
+    } finally {
       setLoading(false);
-      return;
+      toast.dismiss(toastLoading);
     }
-
-    const accessToken = await signIn(email, password);
-
-    if (accessToken) {
-      setToken(accessToken);
-      navigate('/create-entity');
-    }
-
-    toast.dismiss(toastLoading);
   };
 
   return (
@@ -83,34 +120,51 @@ const SignUp = () => {
       <div className="flex flex-col gap-4 mt-10">
         <Input
           label="Email"
-          onChange={(ev) => setEmail(ev.target.value)}
           id="email"
           type="email"
-          value={email}
           error={error.email}
+          value={formData.email}
+          onChange={(ev) => setFormData({ ...formData, email: ev.target.value })}
+          loading={loading}
         />
 
         <Input
           label="Username"
-          onChange={(ev) => setName(ev.target.value)}
           id="name"
           type="text"
-          value={name}
           error={error.name}
+          value={formData.name}
+          onChange={(ev) => setFormData({ ...formData, name: ev.target.value })}
+          loading={loading}
         />
 
         <Input
           label="Password"
-          onChange={(ev) => setPassword(ev.target.value)}
           id="password"
           type="password"
-          value={password}
           error={error.password}
+          value={formData.password}
+          onChange={(ev) => setFormData({ ...formData, password: ev.target.value })}
+          loading={loading}
+        />
+        <Input
+          label="Confirm Password"
+          id="confirm-password"
+          type="text"
+          error={error.confirmPassword}
+          value={formData.confirmPassword}
+          onChange={(ev) => setFormData({ ...formData, confirmPassword: ev.target.value })}
+          loading={loading}
         />
         <button
-          className={`h-12 bg-primary mt-4 text-white font-inter rounded-md ${
-            loading ? 'bg-opacity-80 cursor-not-allowed' : ''
-          }`}
+          className={`
+            h-12 
+            mt-4
+            bg-primary 
+            text-white font-inter 
+            rounded-md 
+            ${loading ? 'bg-opacity-80 cursor-not-allowed' : ''}
+          `}
           type="submit"
         >
           Sign up
@@ -119,9 +173,20 @@ const SignUp = () => {
       <div className="flex justify-center text-zinc-400 font-inter mt-4 text-sm">
         <div className="">
           Already have an account?{' '}
-          <Link to="/sign-in" className="text-primary font-montserrat cursor-pointer hover:underline">
-            Sign in
-          </Link>
+          <span className={`${loading ? 'cursor-not-allowed' : ''}`}>
+            <Link
+              to="/sign-in"
+              className={`
+                text-primary 
+                font-montserrat 
+                cursor-pointer 
+                hover:underline 
+                ${loading ? 'pointer-events-none' : ''}
+              `}
+            >
+              Sign in
+            </Link>
+          </span>
         </div>
       </div>
     </form>

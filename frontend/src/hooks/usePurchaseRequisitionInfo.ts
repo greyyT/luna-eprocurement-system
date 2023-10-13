@@ -1,45 +1,44 @@
+import useSWR from 'swr';
 import fetcher from '@/api/fetcher';
-import { create } from 'zustand';
+import { z } from 'zod';
 
-interface usePurchaseRequisitionInfoProps {
-  data: any;
-  dataKey: string;
-  comments: any;
-  commentsKey: string;
-  fetchData: (token: string, projectCode: string, id: string) => Promise<void>;
-  fetchComments: (
-    token: string,
-    projectCode: string,
-    id: string,
-    page: number | string,
-    force?: boolean,
-  ) => Promise<void>;
-}
+const productSchema = z.object({
+  id: z.string(),
+  code: z.string(),
+  quantity: z.number(),
+  vendorCode: z.string(),
+  vendorName: z.string(),
+  price: z.number(),
+});
 
-const usePurchaseRequisitionInfo = create<usePurchaseRequisitionInfoProps>((set, get) => ({
-  data: null,
-  comments: null,
-  dataKey: '',
-  commentsKey: '',
-  fetchData: async (token: string, projectCode: string, id: string) => {
-    const url = `/api/purchase-requisition/${projectCode}/${id}`;
-    if (get().dataKey === url) return;
+const purchaseRequisitionInfoSchema = z.object({
+  id: z.string(),
+  purchaseName: z.string(),
+  priority: z.string(),
+  projectCode: z.string(),
+  requester: z.string(),
+  targetDate: z.string(),
+  dueDate: z.string(),
+  status: z.string(),
+  products: z.array(productSchema),
+  isApproved: z.boolean(),
+  isRejected: z.boolean(),
+  rejectedComment: z.string().nullable(),
+  commentCount: z.number(),
+});
 
-    const response = await fetcher(url, token);
+export const usePurchaseRequisitionInfo = (id: string, isOpen: boolean) => {
+  const key = id && isOpen ? `/api/purchase-requisition/${id}` : null;
 
-    set({ data: response, dataKey: url });
-  },
-  fetchComments: async (token: string, projectCode: string, id: string, page: number | string, force?: boolean) => {
-    const url = `/api/purchase-requisition/${projectCode}/${id}/comments?page=${page}&size=2`;
+  const { data, error, isLoading, mutate } = useSWR(key, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-    if (!force) {
-      if (get().commentsKey === url) return;
-    }
-
-    const response = await fetcher(url, token);
-
-    set({ comments: response, commentsKey: url });
-  },
-}));
-
-export default usePurchaseRequisitionInfo;
+  return {
+    data: data ? purchaseRequisitionInfoSchema.parse(data) : undefined,
+    error,
+    isLoading,
+    mutate,
+  };
+};

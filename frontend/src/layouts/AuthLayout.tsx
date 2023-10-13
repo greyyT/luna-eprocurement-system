@@ -1,16 +1,10 @@
-import { useEffect } from 'react';
-import useToken from '../hooks/useToken';
-import { useNavigate } from 'react-router-dom';
+import Loader from '@/components/ui/Loader';
+import useCurrentUser from '@/hooks/useCurrentUser';
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
-  const { token } = useToken();
+  const { isLoading } = useCurrentUser();
 
-  useEffect(() => {
-    if (token) {
-      navigate('/');
-    }
-  }, [token, navigate]);
+  if (isLoading) return <Loader />;
 
   return (
     <div className="bg-[#F8F8F8] h-screen w-screen flex justify-center items-center">

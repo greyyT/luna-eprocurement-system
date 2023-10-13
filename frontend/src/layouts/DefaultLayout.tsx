@@ -1,40 +1,21 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-import useToken from '@/hooks/useToken';
-import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Topbar from '@/components/Topbar';
+import Loader from '@/components/ui/Loader';
 import useCurrentUser from '@/hooks/useCurrentUser';
 import EntityError from '@/pages/EntityError';
+import { Suspense } from 'react';
 
 const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { data: user, isLoading } = useCurrentUser();
 
-  // Initialize the 'params' object with the current search parameters
-  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-
-  const { token, deleteToken } = useToken();
-  const { data: user } = useCurrentUser(token);
-
-  const [entityCode, setEntityCode] = useState<string | null>(params.get('entityCode'));
-
-  useEffect(() => {
-    if (!token) {
-      navigate('/sign-in');
-    }
-    if (user && user.legalEntityCode !== entityCode) {
-      setEntityCode(user.legalEntityCode);
-      params.set('entityCode', user.legalEntityCode || 'null');
-      navigate({ search: params.toString() });
-    }
-  }, [token, navigate, location, user, entityCode, params, deleteToken]);
+  if (isLoading) return <Loader />;
 
   return (
     <>
       <Sidebar />
       <main className="pl-70 min-h-screen bg-mainBg flex flex-col">
         <Topbar />
-        {entityCode === null ? <EntityError /> : children}
+        {user?.legalEntityCode === null ? <EntityError /> : <Suspense>{children}</Suspense>}
       </main>
     </>
   );

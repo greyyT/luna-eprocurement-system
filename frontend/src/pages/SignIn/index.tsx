@@ -1,107 +1,150 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 
 import Input from '@/components/ui/Input';
-import handleInput from '@/utils/validator';
-import useToken from '@/hooks/useToken';
-import { signIn } from '@/api/auth';
+import axiosInstance, { handleError } from '@/api/axios';
+import useCurrentUser from '@/hooks/useCurrentUser';
+import { AxiosError } from 'axios';
+
+const passwordSchema = z
+  .string()
+  .min(8)
+  .max(32)
+  .refine(
+    (password) => {
+      // Use regular expressions to check for at least one uppercase letter and one number
+      const uppercaseRegex = /[A-Z]/;
+      const numberRegex = /[0-9]/;
+
+      return uppercaseRegex.test(password) && numberRegex.test(password);
+    },
+    {
+      message: 'Password must have 8 to 32 characters, at least one uppercase letter, and one number',
+    },
+  );
+
+const schema = z.object({
+  email: z.string().min(1, { message: 'Email is required' }).email(),
+  password: passwordSchema,
+});
 
 const SignIn = () => {
   useEffect(() => {
     document.title = 'Sign In';
   }, []);
 
-  const { setToken } = useToken();
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<{ email: string; password: string }>({ email: '', password: '' });
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
 
+  const [error, setError] = useState({ email: '', password: '' });
+
+  // Mutate the current user data after signing in
+  const { mutate } = useCurrentUser();
+
+  // Reset the error messages when the user changes the input
   useEffect(() => {
     setError({ email: '', password: '' });
-  }, [email, password]);
+  }, [formData]);
 
+  // Handle the sign in form submission
   const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
-    const emailError = handleInput(email, 'required', 'email');
+    // Validate the input
+    const validationResult = schema.safeParse(formData);
 
-    if (emailError) {
-      setError({ ...error, email: emailError });
-      toast.error('Check your input');
-      return;
-    }
+    // If the input is invalid, display the first error messages
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors;
 
-    const passwordError = handleInput(password, 'required', 'password');
-
-    if (passwordError) {
-      setError({ ...error, password: passwordError });
-      toast.error('Check your input');
-      return;
+      if (errors.length > 0) {
+        setError({ ...error, [errors[0].path[0]]: errors[0].message });
+        return;
+      }
     }
 
     setLoading(true);
     const toastLoading = toast.loading('Signing in...');
 
-    const accessToken = await signIn(email, password, setError);
-
-    setLoading(false);
-    toast.dismiss(toastLoading);
-
-    if (accessToken) {
-      setToken(accessToken);
+    try {
+      await axiosInstance.post('/auth/login', formData);
+      await mutate();
       toast.success('User signed in successfully');
-      navigate('/');
-    } else {
-      toast.error('Something went wrong');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const message = handleError(error);
+        toast.error(message);
+      } else {
+        toast.error('Something went wrong');
+      }
+    } finally {
+      setLoading(false);
+      toast.dismiss(toastLoading);
     }
   };
 
   return (
-    <form onSubmit={onSubmit}>
-      <h1 className="font-bold font-inter text-3xl ">Sign In</h1>
-      <div className="flex flex-col gap-4 mt-10">
-        <Input
-          label="Email"
-          onChange={(ev) => setEmail(ev.target.value)}
-          id="email"
-          type="email"
-          value={email}
-          error={error.email}
-          loading={loading}
-        />
-        <Input
-          label="Password"
-          onChange={(ev) => setPassword(ev.target.value)}
-          id="password"
-          type="password"
-          value={password}
-          error={error.password}
-          loading={loading}
-        />
-        <button
-          className={`h-12 bg-primary mt-4 text-white font-inter rounded-md ${
-            loading ? 'bg-opacity-80 cursor-not-allowed' : ''
-          }`}
-          type="submit"
-        >
-          Sign in
-        </button>
-      </div>
-      <div className="flex justify-between text-zinc-400 font-inter mt-4 text-sm">
-        <p className="cursor-pointer hover:underline hover:text-primary">Forget password</p>
-        <div className="">
-          Don't have an account?{' '}
-          <Link to="/sign-up" className="text-primary font-montserrat cursor-pointer hover:underline">
-            Sign up
-          </Link>
+    <>
+      <form onSubmit={onSubmit}>
+        <h1 className="font-bold font-inter text-3xl ">Sign In</h1>
+        <div className="flex flex-col gap-4 mt-10">
+          <Input
+            label="Email"
+            id="email"
+            type="email"
+            error={error.email}
+            loading={loading}
+            value={formData.email}
+            onChange={(ev) => setFormData({ ...formData, email: ev.target.value })}
+          />
+          <Input
+            label="Password"
+            id="password"
+            type="password"
+            error={error.password}
+            loading={loading}
+            value={formData.password}
+            onChange={(ev) => setFormData({ ...formData, password: ev.target.value })}
+          />
+          <button
+            className={`
+            h-12 
+            mt-4
+            bg-primary 
+            text-white font-inter 
+            rounded-md 
+            ${loading ? 'bg-opacity-80 cursor-not-allowed' : ''}
+          `}
+            type="submit"
+          >
+            Sign in
+          </button>
         </div>
-      </div>
-    </form>
+        <div className="text-zinc-400 font-inter mt-4 text-sm">
+          Don't have an account?{' '}
+          <span className={`${loading ? 'cursor-not-allowed' : ''}`}>
+            <Link
+              to="/sign-up"
+              className={`
+              text-primary 
+              font-montserrat 
+              cursor-pointer 
+              hover:underline 
+              ${loading ? 'pointer-events-none' : ''}
+            `}
+            >
+              Sign up
+            </Link>
+          </span>
+        </div>
+      </form>
+    </>
   );
 };
 

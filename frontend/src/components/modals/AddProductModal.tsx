@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { KeyedMutator } from 'swr';
 
 import Modal from '../ui/Modal';
-import { useLocation } from 'react-router-dom';
-import { createProduct } from '@/api/entity';
-import useToken from '@/hooks/useToken';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 
 import CloseIcon from '@/assets/icons/close.svg';
 import UploadIcon from '@/assets/images/upload.png';
+import axiosInstance, { handleError } from '@/api/axios';
+import { AxiosError } from 'axios';
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -17,6 +17,21 @@ interface AddProductModalProps {
   mutate: KeyedMutator<any>;
 }
 
+const schema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  description: z.string().min(1, { message: 'Description is required' }),
+  SKU: z.string().min(1, { message: 'SKU is required' }),
+  code: z.string().min(1, { message: 'Code is required' }),
+  category: z.string().min(1, { message: 'Category is required' }),
+  brand: z.string().min(1, { message: 'Brand is required' }),
+  width: z.string().min(1, { message: 'Width is required' }),
+  height: z.string().min(1, { message: 'Height is required' }),
+  length: z.string().min(1, { message: 'Length is required' }),
+  weight: z.string().min(1, { message: 'Weight is required' }),
+  material: z.string().min(1, { message: 'Material is required' }),
+  color: z.string().min(1, { message: 'Color is required' }),
+});
+
 const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, hasTransitionedIn, mutate }) => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -24,24 +39,20 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, hasT
     setIsMounted(true);
   }, []);
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-
-  const { token } = useToken();
-  const legalEntityCode = params.get('entityCode');
-
-  const [name, setName] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [SKU, setSKU] = useState<string>('');
-  const [code, setCode] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
-  const [brand, setBrand] = useState<string>('');
-  const [width, setWidth] = useState<string>('');
-  const [height, setHeight] = useState<string>('');
-  const [length, setLength] = useState<string>('');
-  const [weight, setWeight] = useState<string>('');
-  const [material, setMaterial] = useState<string>('');
-  const [color, setColor] = useState<string>('');
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    SKU: '',
+    code: '',
+    category: '',
+    brand: '',
+    width: '',
+    height: '',
+    length: '',
+    weight: '',
+    material: '',
+    color: '',
+  });
 
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,19 +60,24 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, hasT
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setName('');
-    setDescription('');
-    setSKU('');
-    setCode('');
-    setCategory('');
-    setBrand('');
-    setWidth('');
-    setHeight('');
-    setLength('');
-    setWeight('');
-    setMaterial('');
-    setColor('');
-    setSelectedImage(null);
+    if (!isOpen) {
+      setTimeout(() => {
+        setFormData({
+          name: '',
+          description: '',
+          SKU: '',
+          code: '',
+          category: '',
+          brand: '',
+          width: '',
+          height: '',
+          length: '',
+          weight: '',
+          material: '',
+          color: '',
+        });
+      }, 200);
+    }
   }, [isOpen]);
 
   const onChangeImage = (ev: any) => {
@@ -84,47 +100,59 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, hasT
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+
     if (loading) return;
 
+    const validationResult = schema.safeParse(formData);
+
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors;
+
+      if (errors.length > 0) {
+        toast.error(errors[0].message);
+        return;
+      }
+    }
+
     const product = {
-      name,
-      description,
-      SKU,
-      brand,
-      code,
-      category,
-      weight,
+      name: formData.name,
+      description: formData.description,
+      SKU: formData.SKU,
+      brand: formData.brand,
+      code: formData.code,
+      category: formData.category,
+      weight: formData.weight,
       dimension: {
-        width,
-        height,
-        length,
+        width: formData.width,
+        height: formData.height,
+        length: formData.length,
       },
-      color,
-      material,
-      mediaFile: {
-        productImage: 'Test',
-        videoLink: 'test',
-      },
-      legalEntityCode,
+      color: formData.color,
+      material: formData.material,
+      productImage: selectedImage,
     };
 
     setLoading(true);
     const toastLoading = toast.loading('Creating product...');
 
-    const response = await createProduct(token, product);
-
-    setLoading(false);
-    toast.dismiss(toastLoading);
-
-    if (!response) {
-      toast.error('Something went wrong');
-      return;
+    try {
+      await axiosInstance.post('/api/product', product);
+      await mutate();
+      toast.success('Product created successfully');
+      onClose();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const message = handleError(error);
+        toast.error(message);
+      } else {
+        toast.error('Something went wrong');
+      }
+    } finally {
+      setLoading(false);
+      toast.dismiss(toastLoading);
     }
-
-    toast.success('Product created successfully');
-    mutate();
-    onClose();
   };
 
   if (!isMounted) return null;
@@ -174,134 +202,136 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ isOpen, onClose, hasT
             </div>
           </div>
         )}
-        <div className="mt-7 flex flex-col gap-5">
-          <input
-            type="text"
-            placeholder="Name"
-            className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+        <form onSubmit={onSubmit}>
+          <div className="mt-7 flex flex-col gap-5">
+            <input
+              type="text"
+              placeholder="Name"
+              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                loading ? 'cursor-not-allowed opacity-80' : ''
+              }`}
+              value={formData.name}
+              onChange={(ev) => setFormData({ ...formData, name: ev.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                loading ? 'cursor-not-allowed opacity-80' : ''
+              }`}
+              value={formData.description}
+              onChange={(ev) => setFormData({ ...formData, description: ev.target.value })}
+            />
+            <div className="flex gap-14">
+              <input
+                type="text"
+                placeholder="SKU"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.SKU}
+                onChange={(ev) => setFormData({ ...formData, SKU: ev.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Product Code"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.code}
+                onChange={(ev) => setFormData({ ...formData, code: ev.target.value.toUpperCase() })}
+              />
+            </div>
+            <div className="flex gap-14">
+              <input
+                type="text"
+                placeholder="Category"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.category}
+                onChange={(ev) => setFormData({ ...formData, category: ev.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Brand"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.brand}
+                onChange={(ev) => setFormData({ ...formData, brand: ev.target.value })}
+              />
+            </div>
+            <div className="flex gap-14">
+              <input
+                type="text"
+                placeholder="Width (cm)"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.width}
+                onChange={(ev) => setFormData({ ...formData, width: ev.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Height (cm)"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.height}
+                onChange={(ev) => setFormData({ ...formData, height: ev.target.value })}
+              />
+            </div>
+            <div className="flex gap-14">
+              <input
+                type="text"
+                placeholder="Length (cm)"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.length}
+                onChange={(ev) => setFormData({ ...formData, length: ev.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Weight (kg)"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.weight}
+                onChange={(ev) => setFormData({ ...formData, weight: ev.target.value })}
+              />
+            </div>
+            <div className="flex gap-14">
+              <input
+                type="text"
+                placeholder="Material"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.material}
+                onChange={(ev) => setFormData({ ...formData, material: ev.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Color"
+                className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                  loading ? 'cursor-not-allowed opacity-80' : ''
+                }`}
+                value={formData.color}
+                onChange={(ev) => setFormData({ ...formData, color: ev.target.value })}
+              />
+            </div>
+          </div>
+          <button
+            className={`flex justify-center items-center h-14 w-full mt-10 rounded-[5px] placeholder:text-[#637381] text-white font-roboto leading-5 bg-primary ${
               loading ? 'cursor-not-allowed opacity-80' : ''
             }`}
-            value={name}
-            onChange={(ev) => setName(ev.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Description"
-            className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-              loading ? 'cursor-not-allowed opacity-80' : ''
-            }`}
-            value={description}
-            onChange={(ev) => setDescription(ev.target.value)}
-          />
-          <div className="flex gap-14">
-            <input
-              type="text"
-              placeholder="SKU"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={SKU}
-              onChange={(ev) => setSKU(ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Product Code"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={code}
-              onChange={(ev) => setCode(ev.target.value)}
-            />
-          </div>
-          <div className="flex gap-14">
-            <input
-              type="text"
-              placeholder="Category"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={category}
-              onChange={(ev) => setCategory(ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Brand"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={brand}
-              onChange={(ev) => setBrand(ev.target.value)}
-            />
-          </div>
-          <div className="flex gap-14">
-            <input
-              type="text"
-              placeholder="Width"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={width}
-              onChange={(ev) => setWidth(ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Height"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={height}
-              onChange={(ev) => setHeight(ev.target.value)}
-            />
-          </div>
-          <div className="flex gap-14">
-            <input
-              type="text"
-              placeholder="Length"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={length}
-              onChange={(ev) => setLength(ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Weight"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={weight}
-              onChange={(ev) => setWeight(ev.target.value)}
-            />
-          </div>
-          <div className="flex gap-14">
-            <input
-              type="text"
-              placeholder="Material"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={material}
-              onChange={(ev) => setMaterial(ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Color"
-              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-                loading ? 'cursor-not-allowed opacity-80' : ''
-              }`}
-              value={color}
-              onChange={(ev) => setColor(ev.target.value)}
-            />
-          </div>
-        </div>
-        <button
-          className={`flex justify-center items-center h-14 w-full mt-10 rounded-[5px] placeholder:text-[#637381] text-white font-roboto leading-5 bg-primary ${
-            loading ? 'cursor-not-allowed opacity-80' : ''
-          }`}
-          onClick={onSubmit}
-        >
-          Submit
-        </button>
+            type="submit"
+          >
+            Submit
+          </button>
+        </form>
       </div>
     </Modal>
   );

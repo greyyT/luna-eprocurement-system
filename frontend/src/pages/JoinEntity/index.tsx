@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { AxiosError } from 'axios';
+import { z } from 'zod';
 
 import Input from '@/components/ui/Input';
-import useToken from '@/hooks/useToken';
-import handleInput from '@/utils/validator';
-import axiosInstance from '@/api/axios';
+import axiosInstance, { handleError } from '@/api/axios';
+import useCurrentUser from '@/hooks/useCurrentUser';
+
+const schema = z.object({
+  entityCode: z.string().min(4).max(6),
+});
 
 const JoinEntity = () => {
   useEffect(() => {
@@ -14,7 +18,8 @@ const JoinEntity = () => {
   }, []);
 
   const navigate = useNavigate();
-  const { token } = useToken();
+
+  const { mutate } = useCurrentUser();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [entityCode, setEntityCode] = useState<string>('');
@@ -27,39 +32,35 @@ const JoinEntity = () => {
   const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
-    const enityError = handleInput(entityCode, 'required', 'entityCode');
+    const validationResult = schema.safeParse({ entityCode });
 
-    if (enityError) {
-      setError(enityError);
-      toast.error('Check your input');
-      return;
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors;
+
+      if (errors.length > 0) {
+        setError(errors[0].message);
+        return;
+      }
     }
 
+    const toastLoading = toast.loading('Joining entity...');
     setLoading(true);
 
     try {
-      await axiosInstance.post(
-        '/api/entity/join-entity',
-        { legalEntityCode: entityCode },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-
+      await axiosInstance.post('/api/entity/join-entity', { legalEntityCode: entityCode });
+      await mutate();
       toast.success('Successfully joined entity');
-      navigate({
-        pathname: '/',
-        search: `entityCode=${entityCode}`,
-      });
-    } catch (err) {
-      toast.error('Something went wrong');
-      if (axios.isAxiosError(err)) {
-        if (err.response) {
-          setError(err.response.data.message);
-        } else {
-          setError('Internal server error');
-        }
+      navigate('/');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const message = handleError(error);
+        toast.error(message);
+      } else {
+        toast.error('An error occurred');
       }
     } finally {
       setLoading(false);
+      toast.dismiss(toastLoading);
     }
   };
 
@@ -67,19 +68,25 @@ const JoinEntity = () => {
     <form onSubmit={onSubmit} className="flex flex-col gap-8 py-9">
       <Input
         label="Legal Entity Code"
-        onChange={(ev) => setEntityCode(ev.target.value)}
+        onChange={(ev) => setEntityCode(ev.target.value.toUpperCase())}
         id="entity"
         type="text"
         value={entityCode}
         error={error}
       />
       <button
-        className={`h-12 bg-primary mt-4 text-white font-inter rounded-md ${
-          loading ? 'bg-opacity-80 cursor-not-allowed' : ''
-        }`}
+        className={`
+          h-12 
+          bg-primary 
+          mt-4 
+          text-white 
+          font-inter 
+          rounded-md 
+          ${loading ? 'bg-opacity-80 cursor-not-allowed' : ''}
+        `}
         type="submit"
       >
-        Join a Legal Entity
+        Join this Legal Entity
       </button>
     </form>
   );

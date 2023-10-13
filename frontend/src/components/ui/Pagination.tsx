@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import ArrowIcon from '@/assets/icons/arrow.svg';
 
 interface PaginationProps {
-  totalPages: number;
+  totalPages: number | undefined;
   defaultPage?: number;
 }
 
@@ -45,13 +45,14 @@ const Pagination: React.FC<PaginationProps> = React.memo(({ totalPages, defaultP
     setSearchParams(newSearchParams);
   };
 
-  if (totalPages <= 1 || Number(currentPage) > totalPages) {
+  if (totalPages && (totalPages <= 1 || Number(currentPage) > totalPages)) {
     return null;
   }
 
-  for (let i = 1; i <= totalPages; ++i) {
-    pages.push(i);
-  }
+  if (totalPages)
+    for (let i = 1; i <= totalPages; ++i) {
+      pages.push(i);
+    }
 
   return (
     <div className="flex items-center justify-center bg-white">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 interface ActionButtonProps {
-  type: string;
+  type: 'edit' | 'delete' | 'add team' | 'cancel' | 'done';
   onClick: () => void;
   isLoading?: boolean;
 }
@@ -23,11 +23,26 @@ const ActionButton: React.FC<ActionButtonProps> = ({ type, onClick, isLoading })
         if (isLoading) return;
         onClick();
       }}
-      className={`flex items-center justify-center rounded-[32px] transition duration-50 bg-white border border-solid action-btn-${color} ${
-        isLoading ? 'opacity-70 cursor-not-allowed' : ''
-      }`}
+      className={`
+        flex 
+        items-center 
+        justify-center 
+        rounded-[32px] 
+        transition-all 
+        bg-white 
+        border 
+        border-solid 
+        action-btn-${color} 
+        capitalize 
+        text-sm 
+        leading-[18px] 
+        px-5 py-2 
+        hover:text-white 
+        font-inter 
+        font-medium 
+        ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
     >
-      <p className={`px-5 py-2 capitalize text-sm leading-[18px] hover:text-white`}>{type}</p>
+      {type}
     </button>
   );
 };

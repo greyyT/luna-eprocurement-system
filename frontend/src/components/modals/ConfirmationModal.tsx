@@ -11,6 +11,10 @@ interface ConfirmationModalProps {
   isLoading: boolean;
   header: string;
   description: string;
+  input?: boolean;
+  inputValue?: string;
+  setInputValue?: any;
+  inputPlaceholder?: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -21,6 +25,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isLoading,
   header,
   description,
+  input,
+  inputValue,
+  setInputValue,
+  inputPlaceholder,
 }) => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -32,9 +40,18 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} hasTransitionedIn={hasTransitionedIn} isLoading={isLoading}>
-      <div className="p-6 bg-white w-[500px] rounded-lg relative" onClick={(ev) => ev.stopPropagation()}>
+      <div className="p-6 bg-white w-[500px] rounded-lg relative z-50" onClick={(ev) => ev.stopPropagation()}>
         <h1 className="font-inter font-semibold text-lg">{header}</h1>
         <p className="font-inter text-sm">{description}</p>
+        {input && (
+          <input
+            type="text"
+            className="border border-gray-300 rounded-md px-4 py-2 mt-4 w-full text-sm font-inter text-mainText"
+            placeholder={inputPlaceholder}
+            value={inputValue}
+            onChange={(ev) => setInputValue(ev.target.value)}
+          />
+        )}
         <img src={CloseIcon} className="h-4 cursor-pointer absolute top-6 right-6" alt="" onClick={onClose} />
         <div className="flex items-center justify-end mt-10 gap-4">
           <button

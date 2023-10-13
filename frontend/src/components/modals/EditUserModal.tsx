@@ -1,134 +1,133 @@
 import { useEffect, useState } from 'react';
 
-import useToken from '@/hooks/useToken';
-import { Member } from '@/utils/interface';
+import { DepartmentProps, Member, TeamProps } from '@/utils/interface';
 import { useModal } from '@/hooks/useModal';
 import { ROLE_LIST } from '@/utils/role';
 import Modal from '@/components/ui/Modal';
-import SelectBox from '@/components/modals/SelectBox';
 import { toast } from 'react-hot-toast';
-import { setUserDepartment, setUserRole, setUserTeam } from '@/api/entity';
 
 import UserPortrait from '@/assets/images/user-portrait.png';
+import useCurrentUser from '@/hooks/useCurrentUser';
+import { useCurrentEntity } from '@/hooks/useCurrentEntity';
+import EditUserSelectBox from '@/pages/Settings/UserList/components/EditUserSelectBox';
+import { AxiosError } from 'axios';
+import axiosInstance, { handleError } from '@/api/axios';
 
 interface EditUserModalProps {
   isOpen: boolean;
   hasTransitionedIn: boolean;
   onClose: () => void;
-  entityInfo: any;
   mutate: any;
 }
 
-const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClose, hasTransitionedIn, mutate }) => {
+interface RoleProps {
+  id: number;
+  name: string;
+}
+
+const EditUserModal: React.FC<EditUserModalProps> = ({ isOpen, onClose, hasTransitionedIn, mutate }) => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const { token } = useToken();
+  const { data: currentUser } = useCurrentUser();
+  const { data: entityInfo } = useCurrentEntity();
 
   const member: Member = useModal((state) => state.data);
   const setClosable = useModal((state) => state.setClosable);
 
-  const [department, setDepartment] = useState<any>(null);
-  const [team, setTeam] = useState<any>(null);
-  const [role, setRole] = useState<null | string>(member?.role);
+  const [department, setDepartment] = useState<DepartmentProps | null | undefined>(null);
+  const [team, setTeam] = useState<TeamProps | null | undefined>(null);
+  const [role, setRole] = useState<RoleProps | null | undefined>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    setDepartment({
-      departmentCode: member?.departmentCode,
-      departmentName: member?.departmentName,
-    });
-    setTeam({
-      teamCode: member?.teamCode,
-      teamName: member?.teamName,
-    });
-    setRole(member?.role);
-  }, [member]);
+  const [teamOptions, setTeamOptions] = useState<TeamProps[] | null>(department?.teams || null);
 
-  const selectBoxes = [
-    {
-      selected: department,
-      setSelected: setDepartment,
-      options: entityInfo?.departments || [],
-      code: 'departmentCode',
-      name: 'departmentName',
-      alt: '-- Choose Department --',
-      noItemPlaceholder: 'No department available',
-    },
-    {
-      selected: !department?.departmentCode ? false : team,
-      setSelected: setTeam,
-      options:
-        entityInfo?.departments &&
-        entityInfo?.departments.find((depart: any) => depart.departmentCode === department?.departmentCode)?.teams,
-      code: 'teamCode',
-      name: 'teamName',
-      alt: '-- Choose Team --',
-      noItemPlaceholder: 'No team available',
-    },
-    {
-      selected: role,
-      setSelected: setRole,
-      options: ROLE_LIST.filter((item) => item !== role),
-      code: '',
-      alt: '-- Choose Role --',
-      noItemPlaceholder: 'No role available',
-    },
-  ];
+  useEffect(() => {
+    if (isOpen) {
+      const userDepartment = entityInfo?.departments?.find(
+        (department) => department.departmentCode === member?.departmentCode,
+      );
+      setDepartment(userDepartment);
+
+      setTeamOptions(userDepartment?.teams || null);
+
+      const userTeam = userDepartment?.teams?.find((team) => team.teamCode === member?.teamCode);
+      setTeam(userTeam);
+
+      const userRole = ROLE_LIST.find((role) => role.name === member?.role);
+      setRole(userRole);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [member, isOpen]);
+
+  // Reset all states when the modal is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setTimeout(() => {
+        setDepartment(null);
+        setTeam(null);
+        setTeamOptions(null);
+        setRole(null);
+      }, 200);
+    }
+  }, [isOpen]);
 
   const onSubmit = async () => {
     if (loading) return;
 
-    let change: boolean = false;
     setLoading(true);
     const toastLoading = toast.loading('Updating user...');
 
-    if (department?.departmentCode && member.departmentCode !== department?.departmentCode) {
-      change = true;
-      const res = await setUserDepartment(token, department.departmentCode, member.email);
+    let change: boolean = false;
 
-      if (!res) {
-        toast.error('Something went wrong');
-        return undefined;
+    try {
+      if (department?.departmentCode && member?.departmentCode !== department?.departmentCode) {
+        await axiosInstance.post('/api/department/set-department', {
+          departmentId: department?.id,
+          userId: member?.id,
+        });
+        change = true;
       }
-    }
-
-    if (team?.teamCode && member.teamCode !== team?.teamCode) {
-      change = true;
-      const res = await setUserTeam(token, team.teamCode, member.email);
-
-      if (!res) {
-        toast.error('Something went wrong');
-        return undefined;
+      if (team?.teamCode && member?.teamCode !== team?.teamCode) {
+        await axiosInstance.post('/api/team/set-team', {
+          teamId: team?.id,
+          userId: member?.id,
+        });
+        change = true;
       }
-    }
-
-    if (role && member.role !== role) {
-      change = true;
-      const res = await setUserRole(token, role, member.email);
-
-      if (!res) {
-        toast.error('Something went wrong');
-        return undefined;
+      if (role?.name && member?.role !== role?.name) {
+        await axiosInstance.post('/api/account/set-role', {
+          role: role?.name,
+          userId: member?.id,
+        });
+        change = true;
       }
+
+      if (!change) {
+        toast('Nothing was changed!', {
+          icon: '🔔',
+        });
+        return;
+      }
+
+      await mutate();
+      toast.success('User updated successfully');
+      onClose();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const response = handleError(error);
+        toast.error(response);
+      } else {
+        toast.error('Something went wrong');
+      }
+      if (change) mutate();
+    } finally {
+      toast.dismiss(toastLoading);
+      setLoading(false);
     }
-
-    toast.dismiss(toastLoading);
-    setLoading(false);
-
-    if (!change) {
-      toast('Nothing was changed!', {
-        icon: '🔔',
-      });
-      return undefined;
-    }
-
-    mutate();
-    toast.success('User updated successfully');
-    onClose();
   };
 
   if (!isMounted) return null;
@@ -152,36 +151,69 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ entityInfo, isOpen, onClo
           </div>
         </div>
         <div className="flex flex-col gap-3 mt-4">
-          {selectBoxes.map((selectBox, idx) => (
-            <div key={idx}>
-              <SelectBox
-                code={selectBox.code}
-                name={selectBox.name}
-                options={selectBox.options}
-                selected={selectBox.selected}
-                setSelected={selectBox.setSelected}
-                alt={selectBox.alt}
-                isLoading={loading}
-                noItemPlaceholder={selectBox.noItemPlaceholder}
-              />
-            </div>
-          ))}
+          <EditUserSelectBox
+            alt="-- Choose Department --"
+            selected={department}
+            setSelected={(value: DepartmentProps) => {
+              setDepartment(value);
+              setTeamOptions(value?.teams || null);
+              setTeam(null);
+            }}
+            options={entityInfo?.departments || []}
+            isLoading={loading}
+            name="departmentName"
+            placeholder="No department available"
+          />
+          <EditUserSelectBox
+            alt="-- Choose Team --"
+            selected={team}
+            setSelected={setTeam}
+            options={teamOptions}
+            isLoading={loading}
+            name="teamName"
+            placeholder="No team available"
+          />
+          {currentUser?.id !== member?.id && (
+            <EditUserSelectBox
+              alt="-- Choose Role --"
+              selected={role}
+              setSelected={setRole}
+              options={ROLE_LIST}
+              isLoading={loading}
+              name="name"
+              placeholder="No role available"
+            />
+          )}
         </div>
         <div className="flex mt-6 gap-6">
           <button
-            className={`flex-1 py-3 border border-solid border-gray-250 rounded-lg text-black font-inter leading-6 font-medium ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            onClick={() => {
-              if (!loading) onClose();
-            }}
+            className={`
+              flex-1 
+              py-3 
+              border 
+              border-solid 
+              border-gray-250 
+              rounded-lg 
+              text-black 
+              font-inter 
+              leading-6 
+              font-medium 
+              ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => !loading && onClose()}
           >
             Close
           </button>
           <button
-            className={`flex-1 py-3 font-inter leading-6 font-medium bg-primary text-white rounded-lg ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`
+              flex-1 
+              py-3 
+              font-inter 
+              leading-6 
+              font-medium 
+              bg-primary 
+              text-white 
+              rounded-lg 
+              ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={onSubmit}
           >
             Accept
