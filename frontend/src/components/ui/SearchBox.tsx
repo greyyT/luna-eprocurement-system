@@ -1,19 +1,32 @@
 import { Link } from 'react-router-dom';
 
 import MagnifyingGlass from '@/assets/icons/magnifying.svg';
-import Product1 from '@/assets/images/product-1.png';
 
 interface SearchBoxProps {
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   searchResult: any;
-  api: string;
+  api?: string;
   placeholder: string;
   name: string;
   code: string;
+  img?: string;
+  link: boolean;
+  onClick?: any;
 }
 
-const SearchBox: React.FC<SearchBoxProps> = ({ search, setSearch, searchResult, api, placeholder, name, code }) => {
+const SearchBox: React.FC<SearchBoxProps> = ({
+  search,
+  setSearch,
+  searchResult,
+  api,
+  placeholder,
+  name,
+  code,
+  img,
+  link,
+  onClick,
+}) => {
   return (
     <div className="relative">
       <input
@@ -24,26 +37,54 @@ const SearchBox: React.FC<SearchBoxProps> = ({ search, setSearch, searchResult, 
         onChange={(ev) => setSearch(ev.target.value)}
       />
       <img src={MagnifyingGlass} alt="" className="absolute top-1/2 -translate-y-1/2 left-6" />
-      {searchResult && searchResult?.length !== 0 && (
+      {search.length !== 0 && searchResult && searchResult?.length !== 0 && (
         <div className="absolute top-full left-0 w-full bg-white rounded-lg border border-solid border-gray-300 mt-2 z-30">
-          <div className="flex flex-col gap-2 p-4">
-            <p className="font-inter font-semibold text-lg text-black">Search results</p>
+          <div className="flex flex-col gap-2 py-4">
+            <p className="font-inter font-semibold text-mainText px-4">Search results</p>
+            <div className="line mx-4"></div>
             <div className="flex flex-col gap-2">
-              {searchResult?.map((result: any) => {
-                return (
-                  <Link
-                    key={result?.code}
-                    to={`/${api}/${result?.[code]}`}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <img src={Product1} alt="" className="w-[40px]" />
-                    <div className="flex flex-col gap-1">
-                      <p className="font-inter font-semibold text-lg text-black">{result?.[name]}</p>
-                      <p className="font-inter font-medium text-[#637381]">{result?.[code]}</p>
+              {link &&
+                searchResult?.map((result: any, idx: number) => {
+                  return (
+                    <Link
+                      key={idx}
+                      to={`/${api}/${result?.[code]}`}
+                      className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 transition-all px-4 py-2"
+                    >
+                      {img && (
+                        <div
+                          style={{ backgroundImage: `url('${result?.[img]}')` }}
+                          className="w-10 h-10 bg-cover bg-no-repeat bg-center"
+                        ></div>
+                      )}
+                      <div className="flex flex-col">
+                        <p className="font-inter font-semibold text-lg text-black">{result?.[name]}</p>
+                        <p className="font-inter font-medium text-[#637381] text-sm">{result?.[code]}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              {!link &&
+                searchResult?.map((result: any, idx: number) => {
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 transition-all px-4 py-2"
+                      onClick={() => onClick(result)}
+                    >
+                      {img && (
+                        <div
+                          style={{ backgroundImage: `url('${result?.[img]}')` }}
+                          className="w-10 h-10 bg-cover bg-no-repeat bg-center"
+                        ></div>
+                      )}
+                      <div className="flex flex-col">
+                        <p className="font-inter font-semibold text-lg text-black">{result?.[name]}</p>
+                        <p className="font-inter font-medium text-[#637381] text-sm">{result?.[code]}</p>
+                      </div>
                     </div>
-                  </Link>
-                );
-              })}
+                  );
+                })}
             </div>
           </div>
         </div>

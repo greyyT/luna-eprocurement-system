@@ -26,7 +26,7 @@ const Modal: React.FC<ModalProps> = ({ children, hasTransitionedIn, isOpen, onCl
   if (!isOpen && !hasTransitionedIn) return null;
 
   return (
-    <div className={`modal ${hasTransitionedIn && 'in'} ${isOpen && 'visible'}`} onClick={handleClose}>
+    <div className={`modal ${hasTransitionedIn && 'in'} ${isOpen && 'visible'} backdrop-blur-sm`} onClick={handleClose}>
       {children}
     </div>
   );

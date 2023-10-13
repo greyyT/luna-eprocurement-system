@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Modal from '../ui/Modal';
 import { toast } from 'react-hot-toast';
-import { createVendor } from '@/api/entity';
-import useToken from '@/hooks/useToken';
 import { KeyedMutator } from 'swr';
+import { z } from 'zod';
 
 import CloseIcon from '@/assets/icons/close.svg';
 import UploadIcon from '@/assets/images/upload.png';
+import { AxiosError } from 'axios';
+import axiosInstance, { handleError } from '@/api/axios';
 
 interface AddVendorModalProps {
   isOpen: boolean;
@@ -15,6 +16,13 @@ interface AddVendorModalProps {
   mutate: KeyedMutator<any>;
 }
 
+const schema = z.object({
+  businessName: z.string().min(1, { message: 'Business name is required' }),
+  businessNumber: z.string().min(1, { message: 'Business number is required' }),
+  code: z.string().min(1, { message: 'Vendor code is required' }),
+  description: z.string().min(1, { message: 'Description is required' }),
+});
+
 const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTransitionedIn, mutate }) => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -22,11 +30,12 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
     setIsMounted(true);
   }, []);
 
-  const { token } = useToken();
-
-  const [businessName, setBusinessName] = useState<string>('');
-  const [businessNumber, setBusinessNumber] = useState<string>('');
-  const [code, setCode] = useState<string>('');
+  const [formData, setFormData] = useState({
+    businessName: '',
+    businessNumber: '',
+    code: '',
+    description: '',
+  });
 
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,9 +57,16 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
   };
 
   useEffect(() => {
-    setBusinessName('');
-    setBusinessNumber('');
-    setCode('');
+    if (!isOpen) {
+      setTimeout(() => {
+        setFormData({
+          businessName: '',
+          businessNumber: '',
+          code: '',
+          description: '',
+        });
+      }, 200);
+    }
   }, [isOpen]);
 
   const onAddImage = () => {
@@ -59,31 +75,51 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+
     if (loading) return;
 
-    const vendor = {
-      businessName,
-      businessNumber,
-      code,
-    };
+    // Validate the input
+    const validationResult = schema.safeParse(formData);
+
+    // If the input is invalid, display the first error messages
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors;
+
+      if (errors.length > 0) {
+        toast.error(errors[0].message);
+        return;
+      }
+    }
 
     setLoading(true);
     const toastLoading = toast.loading('Creating vendor...');
 
-    const response = await createVendor(token, vendor);
+    const vendor = {
+      businessName: formData.businessName,
+      businessNumber: formData.businessNumber,
+      code: formData.code,
+      description: formData.description,
+      vendorImage: selectedImage,
+    };
 
-    setLoading(false);
-    toast.dismiss(toastLoading);
-
-    if (!response) {
-      toast.error('Something went wrong');
-      return;
+    try {
+      await axiosInstance.post('/api/vendor', vendor);
+      await mutate();
+      toast.success('Vendor created successfully');
+      onClose();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const message = handleError(error);
+        toast.error(message);
+      } else {
+        toast.error('Something went wrong');
+      }
+    } finally {
+      setLoading(false);
+      toast.dismiss(toastLoading);
     }
-
-    toast.success('Product created successfully');
-    mutate();
-    onClose();
   };
 
   if (!isMounted) return null;
@@ -133,43 +169,54 @@ const AddVendorModal: React.FC<AddVendorModalProps> = ({ isOpen, onClose, hasTra
             </div>
           </div>
         )}
-        <div className="mt-7 flex flex-col gap-5">
-          <input
-            type="text"
-            placeholder="Name"
-            className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+        <form onSubmit={onSubmit}>
+          <div className="mt-7 flex flex-col gap-5">
+            <input
+              type="text"
+              placeholder="Name"
+              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                loading ? 'cursor-not-allowed opacity-80' : ''
+              }`}
+              value={formData.businessName}
+              onChange={(ev) => setFormData({ ...formData, businessName: ev.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                loading ? 'cursor-not-allowed opacity-80' : ''
+              }`}
+              value={formData.description}
+              onChange={(ev) => setFormData({ ...formData, description: ev.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Vendor Code"
+              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                loading ? 'cursor-not-allowed opacity-80' : ''
+              }`}
+              value={formData.code}
+              onChange={(ev) => setFormData({ ...formData, code: ev.target.value.toUpperCase() })}
+            />
+            <input
+              type="text"
+              placeholder="Bussiness Number"
+              className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
+                loading ? 'cursor-not-allowed opacity-80' : ''
+              }`}
+              value={formData.businessNumber}
+              onChange={(ev) => setFormData({ ...formData, businessNumber: ev.target.value })}
+            />
+          </div>
+          <button
+            type="submit"
+            className={`flex justify-center items-center h-14 w-full mt-10 rounded-[5px] placeholder:text-[#637381] text-white font-roboto leading-5 bg-primary ${
               loading ? 'cursor-not-allowed opacity-80' : ''
             }`}
-            value={businessName}
-            onChange={(ev) => setBusinessName(ev.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Vendor Code"
-            className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-              loading ? 'cursor-not-allowed opacity-80' : ''
-            }`}
-            value={code}
-            onChange={(ev) => setCode(ev.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Bussiness Number"
-            className={`w-full font-inter p-4 outline-none border border-solid border-[#F0F0F0] rounded-[5px] placeholder:text-[#637381] ${
-              loading ? 'cursor-not-allowed opacity-80' : ''
-            }`}
-            value={businessNumber}
-            onChange={(ev) => setBusinessNumber(ev.target.value)}
-          />
-        </div>
-        <button
-          onClick={onSubmit}
-          className={`flex justify-center items-center h-14 w-full mt-10 rounded-[5px] placeholder:text-[#637381] text-white font-roboto leading-5 bg-primary ${
-            loading ? 'cursor-not-allowed opacity-80' : ''
-          }`}
-        >
-          Submit
-        </button>
+          >
+            Submit
+          </button>
+        </form>
       </div>
     </Modal>
   );

@@ -5,6 +5,7 @@ const EntityError = () => {
   useEffect(() => {
     document.title = 'NaN';
   }, []);
+
   return (
     <div className="flex items-center justify-center flex-col h-[calc(100vh-5.25rem)] gap-3">
       <h1>The current user has not joined a Legal Entity</h1>

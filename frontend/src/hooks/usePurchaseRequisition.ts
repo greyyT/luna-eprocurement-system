@@ -14,12 +14,16 @@ interface usePurchaseRequisitionProps {
   dateStart: Date | null;
   dateEnd: Date | null;
   isFetched: boolean;
-  fetchData: (token: string, legalEntityCode: string) => Promise<void>;
+  isLoading: boolean;
+  fetchData: () => Promise<void>;
   setData: (data: PurchaseRequisitionColumnsType) => void;
   setDateStart: (date: Date | null) => void;
   setDateEnd: (date: Date | null) => void;
   filterDate: () => void;
   approve: (id: string) => void;
+  reject: (id: string) => void;
+  cancel: (id: string) => void;
+  delete: (id: string, column: string) => void;
 }
 
 const convertDate = (date: string) => {
@@ -33,10 +37,12 @@ export const usePurchaseRequisition = create<usePurchaseRequisitionProps>((set, 
   dateStart: null,
   dateEnd: null,
   isFetched: false,
+  isLoading: false,
   setDateStart: (date: Date | null) => set({ dateStart: date }),
   setDateEnd: (date: Date | null) => set({ dateEnd: date }),
-  fetchData: async (token: string, legalEntityCode: string) => {
-    const response = await fetcher(`/api/purchase-requisition/${legalEntityCode}`, token);
+  fetchData: async () => {
+    set({ isLoading: true });
+    const response = await fetcher(`/api/purchase-requisition`);
     const data = response.data;
 
     const filteredData: PurchaseRequisitionColumnsType = {
@@ -74,7 +80,7 @@ export const usePurchaseRequisition = create<usePurchaseRequisitionProps>((set, 
       },
     };
 
-    set({ data: filteredData, originalData: filteredData, isFetched: true });
+    set({ data: filteredData, originalData: filteredData, isFetched: true, isLoading: false });
   },
   setData: (data: PurchaseRequisitionColumnsType) => set({ data, originalData: data }),
   filterDate: () => {
@@ -110,12 +116,78 @@ export const usePurchaseRequisition = create<usePurchaseRequisitionProps>((set, 
     const approvedItem = originalData.WAITING_TO_APPROVAL.items.find((item: any) => item.id === id);
 
     approvedItem.isApproved = true;
+    approvedItem.status = 'IN_PROGRESS';
 
     const newData = {
       ...originalData,
       WAITING_TO_APPROVAL: {
         ...originalData.WAITING_TO_APPROVAL,
-        items: [...originalData.WAITING_TO_APPROVAL.items.filter((item: any) => item.id !== id), approvedItem],
+        items: originalData.WAITING_TO_APPROVAL.items.filter((item: any) => item.id !== id),
+      },
+      IN_PROGRESS: {
+        ...originalData.IN_PROGRESS,
+        items: [...originalData.IN_PROGRESS.items, approvedItem],
+      },
+    };
+
+    set({ originalData: newData });
+
+    get().filterDate();
+  },
+  reject: (id: string) => {
+    const originalData = get().originalData;
+
+    const rejectedItem = originalData.WAITING_TO_APPROVAL.items.find((item: any) => item.id === id);
+
+    rejectedItem.isRejected = true;
+    rejectedItem.isApproved = false;
+    rejectedItem.status = 'CANCELLED';
+
+    const newData = {
+      ...originalData,
+      WAITING_TO_APPROVAL: {
+        ...originalData.WAITING_TO_APPROVAL,
+        items: originalData.WAITING_TO_APPROVAL.items.filter((item: any) => item.id !== id),
+      },
+      CANCELLED: {
+        ...originalData.CANCELLED,
+        items: [...originalData.CANCELLED.items, rejectedItem],
+      },
+    };
+
+    set({ originalData: newData });
+
+    get().filterDate();
+  },
+  cancel: (id: string) => {
+    const originalData = get().originalData;
+
+    const cancelledItem = originalData.CANCELLED.items.find((item: any) => item.id === id);
+
+    cancelledItem.isApproved = false;
+    cancelledItem.isRejected = true;
+    cancelledItem.status = 'CANCELLED';
+
+    const newData = {
+      ...originalData,
+      CANCELLED: {
+        ...originalData.CANCELLED,
+        items: [...originalData.CANCELLED.items.filter((item: any) => item.id !== id), cancelledItem],
+      },
+    };
+
+    set({ originalData: newData });
+
+    get().filterDate();
+  },
+  delete: (id: string, column: string) => {
+    const originalData = get().originalData;
+
+    const newData = {
+      ...originalData,
+      [column]: {
+        ...originalData[column],
+        items: originalData[column].items.filter((item: any) => item.id !== id),
       },
     };
 

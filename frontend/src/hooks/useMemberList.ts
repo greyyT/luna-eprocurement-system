@@ -1,23 +1,35 @@
 import useSWR from 'swr';
 import fetcher from '@/api/fetcher';
-import useCurrentUser from './useCurrentUser';
+import { z } from 'zod';
 
-const useMemberList = (legalEntityCode: string, token: string) => {
-  const { data: user } = useCurrentUser(token);
+const userSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.string().email(),
+  role: z.string(),
+  legalEntityCode: z.string().nullable(),
+  departmentCode: z.string().nullable(),
+  departmentName: z.string().nullable(),
+  teamCode: z.string().nullable(),
+  teamName: z.string().nullable(),
+});
 
-  const { data, error, isLoading, mutate } = useSWR(
-    `/api/entity/${legalEntityCode}/account`,
-    (url) => fetcher(url, token),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+const accountListSchema = z.object({
+  data: z.array(userSchema),
+  totalPages: z.number(),
+  totalElements: z.number(),
+  size: z.number(),
+  currentPage: z.number(),
+});
 
-  const filteredData = data?.data?.filter((member: any) => member?.email !== user?.email);
+const useMemberList = () => {
+  const { data, error, isLoading, mutate } = useSWR(`/api/entity/account`, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   return {
-    data: filteredData,
+    data: data ? accountListSchema.parse(data) : undefined,
     error,
     isLoading,
     mutate,

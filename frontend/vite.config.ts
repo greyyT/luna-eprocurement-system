@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => {
   };
 
   if (command !== 'serve') {
-    config.base = '/lunar-eprocurement-system/';
+    config.base = '/luna-eprocurement-system/';
   }
 
   return config;

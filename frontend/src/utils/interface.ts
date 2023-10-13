@@ -8,7 +8,7 @@ export interface Account {
 }
 
 export interface Member {
-  id: number;
+  id: string;
   email: string;
   username: string;
   role: string | null;
@@ -17,4 +17,17 @@ export interface Member {
   departmentName: string | null;
   teamCode: string | null;
   teamName: string | null;
+}
+
+export interface TeamProps {
+  id: string;
+  teamCode: string;
+  teamName: string;
+}
+
+export interface DepartmentProps {
+  id: string;
+  departmentCode: string;
+  departmentName: string;
+  teams: TeamProps[];
 }
