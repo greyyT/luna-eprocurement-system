@@ -28,17 +28,15 @@ const useCurrentUser = () => {
   const { data, error, isLoading, mutate } = useSWR('/api/account', fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
+    revalidateIfStale: currentRoute !== 'sign-in' && currentRoute !== 'sign-up',
+    revalidateOnMount: currentRoute !== 'sign-in' && currentRoute !== 'sign-up',
     shouldRetryOnError: currentRoute !== 'sign-in' && currentRoute !== 'sign-up',
+    refreshInterval: currentRoute !== 'sign-in' && currentRoute !== 'sign-up' ? 10000 : 0,
+    refreshWhenHidden: currentRoute !== 'sign-in' && currentRoute !== 'sign-up',
+    refreshWhenOffline: currentRoute !== 'sign-in' && currentRoute !== 'sign-up',
     onErrorRetry: (error) => {
       if (currentRoute === 'sign-in' || currentRoute === 'sign-up') return;
       if (error.status === 401) {
-        toast.error('Your session has expired. Please sign in again.');
-        navigate('/sign-in');
-      }
-    },
-    onError: (err) => {
-      if (currentRoute === 'sign-in' || currentRoute === 'sign-up') return;
-      if (err.response.status === 401) {
         toast.error('Your session has expired. Please sign in again.');
         navigate('/sign-in');
       }
