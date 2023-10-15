@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.DEV ? 'http://localhost:8080/' : 'https://luna-backend.vercel.app/',
+  baseURL: 'https://luna-backend.vercel.app/',
   headers: {
     'Content-Type': 'application/json',
   },

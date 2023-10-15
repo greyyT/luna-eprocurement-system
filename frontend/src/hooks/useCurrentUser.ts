@@ -29,6 +29,13 @@ const useCurrentUser = () => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     shouldRetryOnError: currentRoute !== 'sign-in' && currentRoute !== 'sign-up',
+    onErrorRetry: (error) => {
+      if (currentRoute === 'sign-in' || currentRoute === 'sign-up') return;
+      if (error.status === 401) {
+        toast.error('Your session has expired. Please sign in again.');
+        navigate('/sign-in');
+      }
+    },
     onError: (err) => {
       if (currentRoute === 'sign-in' || currentRoute === 'sign-up') return;
       if (err.response.status === 401) {
