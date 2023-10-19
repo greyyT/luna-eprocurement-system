@@ -168,7 +168,6 @@ const AddPurchaseRequisitionModal: React.FC<AddPurchaseRequisitionModalProps> = 
     setVendorList([]);
   };
 
-  // Remove product from chosen product list
   const onRemoveProduct = () => {
     if (isLoading) return;
     const newList = productList.slice(0, -1);
