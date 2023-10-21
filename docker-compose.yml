@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=luna-postgres
+      - POSTGRES_PASSWORD=luna-postgres
+      - POSTGRES_DB=luna-postgres
+    networks:
+      - shared-network
+    volumes:
+      - ./postgres-db:/var/lib/postgresql/data
+
+  backend:
+    container_name: luna_api
+    hostname: backend
+    restart: unless-stopped
+    image: luna-api-prod:1.0.0
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    networks:
+      - shared-network
+    depends_on:
+      - postgres
+
+  frontend:
+    container_name: luna_frontend
+    restart: unless-stopped
+    image: luna-frontend-prod:1.0.0
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:3000
+    networks:
+      - shared-network
+    depends_on:
+      - backend
+      - postgres
+
+networks:
+  shared-network:
+    driver: bridge

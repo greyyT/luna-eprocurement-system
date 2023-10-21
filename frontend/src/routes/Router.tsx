@@ -28,7 +28,7 @@ const PurchaseRequisition = React.lazy(() => import('@/pages/PurchaseRequisition
 
 export const Router = () => {
   return (
-    <BrowserRouter basename={import.meta.env.DEV ? '/' : '/luna-eprocurement-system/'}>
+    <BrowserRouter basename={import.meta.env.VITE_DEPLOYMENT !== 'github-page' ? '/' : '/luna-eprocurement-system/'}>
       <InfoModalLayout>
         <Routes>
           <Route
