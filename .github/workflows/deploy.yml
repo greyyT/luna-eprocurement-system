@@ -34,6 +34,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Set up Environment Variables
+        run: echo "VITE_DEPLOYMENT=${{ secrets.VITE_DEPLOYMENT }}" >> ./frontend/.env
+      - run: echo "VITE_BACKEND_API=${{ secrets.VITE_BACKEND_API }}" >> ./frontend/.env
       - name: Install dependencies
         run: cd ./frontend && npm install
       - name: Build

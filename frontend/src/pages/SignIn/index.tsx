@@ -73,7 +73,8 @@ const SignIn = () => {
     const toastLoading = toast.loading('Signing in...');
 
     try {
-      await axiosInstance.post('/auth/login', formData);
+      const response = await axiosInstance.post('/auth/login', formData);
+      localStorage.setItem('accessToken', response.data.access_token);
       await mutate();
       toast.success('User signed in successfully');
     } catch (error) {

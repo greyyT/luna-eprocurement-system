@@ -1,0 +1,28 @@
+{
+  "name": "lunar-eprocurement-system",
+  "version": "1.0.0",
+  "main": "index.js",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "frontend:dev": "npm run dev --workspace=frontend",
+    "backend:start": "wait-on tcp:5432 && npm run start --workspace=backend",
+    "docker:build": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:up": "docker compose up -d",
+    "restart:frontend": "docker restart luna_frontend",
+    "restart:backend": "docker restart luna_api",
+    "start": "concurrently 'npm:backend:start' 'npm:frontend:dev'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "greyyT",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.0.1"
+  }
+}

@@ -20,6 +20,7 @@ const Sidebar = () => {
   const logout = async () => {
     try {
       await axiosInstance.post('/auth/logout');
+      localStorage.removeItem('accessToken');
       await mutate(() => true, undefined, { revalidate: false });
       toast.success('User logged out successfully');
       navigate('/sign-in');

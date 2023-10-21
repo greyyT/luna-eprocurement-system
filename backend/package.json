@@ -1,0 +1,15 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "python3 manage.py runserver 0.0.0.0:8000",
+    "migrate": "python3 manage.py migrate",
+    "makemigrations": "python3 manage.py makemigrations",
+    "createsuperuser": "python3 manage.py createsuperuser",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -27,3 +27,6 @@ dist-ssr
 .prettierrc
 .venv
 __pycache__
+backend/media
+.env
+postgres-db
