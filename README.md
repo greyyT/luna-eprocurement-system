@@ -8,16 +8,19 @@
 
 - [Overview](#overview)
 - [Installation](#installation)
+- [Features](#features)
 
 ## Overview
 
 <p align="justify">
-The **Luna eProcurement System** is an open-source project designed to simplify company management tasks. It offers a user-friendly interface for managing several aspects of your organization (users, projects, tasks, etc.). This **README** provides an overview of the project, its features, and instructions on how to get started.
+The <b>Luna eProcurement System</b> is an open-source project designed to simplify company management tasks. It offers a user-friendly interface for managing several aspects of your organization (users, projects, tasks, etc.). This <b>README</b> provides an overview of the project, its features, and instructions on how to get started.
 </p>
+
+Check out [Luna eProcurement System](https://greyyt.github.io/luna-eprocurement-system/) for live demo.
 
 ## Installation
 
-To run this project locally, follow these steps:
+To run this project locally, follow these steps (make sure to have Docker Desktop or its related packages installed, check out at [Docker Desktop](https://www.docker.com/products/docker-desktop/):
 1. Clone this repo:
 
 ```sh
@@ -37,9 +40,23 @@ VITE_BACKEND_API=http://localhost:8000
 ```ini
 SECRET_KEY=django-insecure-abc # replace abc with your secret
 ALGORITHM=HS256 # Jwt encode method, recommend using HS256
+# The following .env variables can be modified based on the settings in the ./backend/Dockerfile.
+# You can modified it and change these .env values.
 DB_NAME=luna-postgres
 DB_USER=luna-postgres
 DB_PASSWORD=luna-postgres
-DB_HOST=postgres
+DB_HOST=postgres # Check the ./docker-compose.yml postgre service name.
 DB_PORT=5432
 ```
+
+4. Run the application (make sure to have port 5432 - default port of postgresql inactive)
+
+```sh
+make up
+```
+
+You can check the `./Makefile` file for commands used in this project.
+
+## Features
+
+
