@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "python3 manage.py runserver 0.0.0.0:8000",
+    "start": "python3 manage.py runserver localhost:8080",
     "migrate": "python3 manage.py migrate",
     "makemigrations": "python3 manage.py makemigrations",
     "createsuperuser": "python3 manage.py createsuperuser",

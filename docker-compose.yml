@@ -21,8 +21,12 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+    ports:
+      - 8080:8080
     networks:
       - shared-network
+    volumes:
+      - ./backend/media:/usr/src/backend/media
     depends_on:
       - postgres
 
@@ -34,7 +38,7 @@ services:
       context: frontend
       dockerfile: Dockerfile
     ports:
-      - 80:3000
+      - 3000:80
     networks:
       - shared-network
     depends_on:

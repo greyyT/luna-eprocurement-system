@@ -9,12 +9,7 @@
   "scripts": {
     "frontend:dev": "npm run dev --workspace=frontend",
     "backend:start": "wait-on tcp:5432 && npm run start --workspace=backend",
-    "docker:build": "docker compose up --build",
-    "docker:down": "docker compose down",
-    "docker:up": "docker compose up -d",
-    "restart:frontend": "docker restart luna_frontend",
-    "restart:backend": "docker restart luna_api",
-    "start": "concurrently 'npm:backend:start' 'npm:frontend:dev'",
+    "start": "concurrently 'npm:frontend:dev' 'npm:backend:start'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "greyyT",

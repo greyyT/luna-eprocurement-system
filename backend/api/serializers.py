@@ -221,7 +221,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'height': instance.height,
             'length': instance.length,
         }
-        ret['productImage'] = ('http://localhost:8000' + instance.image.url) if instance.image else None
+        ret['productImage'] = ('http://localhost:8080' + instance.image.url) if instance.image else None
         return ret
         
     def create(self, validated_data):
@@ -277,7 +277,7 @@ class VendorSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['vendorImage'] = ('http://localhost:8000' + instance.image.url) if instance.image else None
+        ret['vendorImage'] = ('http://localhost:8080' + instance.image.url) if instance.image else None
         
         return ret
         

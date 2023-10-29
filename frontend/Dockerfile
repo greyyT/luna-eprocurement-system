@@ -1,19 +1,23 @@
-FROM node:14
-
-ENV NODE_ENV=development
+FROM node:lts-alpine as build
 
 WORKDIR /usr/src/frontend
 
-COPY package*.json ./
-RUN npm install 
-
 COPY . .
 
-RUN npm run build
-RUN npm install -g serve
+RUN npm ci && \
+    npm run build
 
-ENV NODE_ENV=production
+ENV CI=true \
+    PORT=3000
 
-EXPOSE 3000
+FROM nginx:stable-alpine as main
 
-CMD ["sh", "-c", "serve -s dist"]
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+WORKDIR /usr/share/nginx/html
+
+RUN rm -rf ./* 
+
+COPY --from=build /usr/src/frontend/dist .
+
+CMD ["nginx", "-g", "daemon off;"]
