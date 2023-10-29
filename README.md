@@ -8,7 +8,7 @@
 
 - [Overview](#overview)
 - [Installation](#installation)
-- [Features and Usages](#features-and-usages)
+- [Features](#features)
 
 ## Overview
 
@@ -59,6 +59,6 @@ Access the application in your web browser ([http://localhost:3000/](http://loca
 
 You can check the `./Makefile` file for commands used in this project.
 
-## Features and Usages
+## Features
 
-
+- **Create accounts**: 
