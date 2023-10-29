@@ -10,5 +10,7 @@
 
 ## Overview
 
+<p align="justify">
 The Luna eProcurement System is an open-source project designed to simplify company management tasks. It offers a user-friendly interface for managing several aspects of your organization (users, projects, tasks, etc.). This README provides an overview of the project, its features, and instructions on how to get started.
+</p>
 
