@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite --host --port 3000",
     "build": "tsc && vite build",
-    "start:production": "serve -s dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

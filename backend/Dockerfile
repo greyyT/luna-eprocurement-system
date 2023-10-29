@@ -1,17 +1,16 @@
-FROM python:3.8-slim-buster
+FROM python:3.8-alpine
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1 \
+    PYTHONUNBUFFERED 1
 
 WORKDIR /usr/src/backend
-
-RUN pip install --upgrade pip
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
-RUN pip install psycopg2-binary
-
 COPY . .
 
-EXPOSE 8000
+RUN pip install --upgrade pip && \
+    pip install --upgrade setuptools && \
+    apk add --no-cache alpine-sdk && \
+    pip install -r requirements.txt
 
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver"]
+EXPOSE 8080
+
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
