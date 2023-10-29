@@ -19,7 +19,9 @@ The **Luna eProcurement System** is an open-source project designed to simplify 
 
 To run this project locally, follow these steps:
 1. Clone this repo:
+
    ```sh
-   npm install
+   git clone git@github.com:greyyT/luna-eprocurement-system.git
    ```
+
 2. Hello
