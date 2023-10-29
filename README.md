@@ -8,7 +8,7 @@
 
 - [Overview](#overview)
 - [Installation](#installation)
-- [Features](#features)
+- [Features and Usages](#features-and-usages)
 
 ## Overview
 
@@ -55,8 +55,10 @@ DB_PORT=5432
 make up
 ```
 
+Access the application in your web browser ([http://localhost:3000/](http://localhost:3000/)).
+
 You can check the `./Makefile` file for commands used in this project.
 
-## Features
+## Features and Usages
 
 
