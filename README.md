@@ -61,4 +61,8 @@ You can check the `./Makefile` file for commands used in this project.
 
 ## Features
 
-- **Create accounts**: 
+- **Authentication**: Users can sign up and sign in to the application.
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/accounts-features.png">
+
+- **Legal Entity**: Users can create, join, and manage legal entities (companies).
