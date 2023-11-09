@@ -68,4 +68,7 @@ You can check the `./Makefile` file for commands used in this project.
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/accounts-features.png">
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/sign-up-features.png">
 
-- **Legal Entity**: Users can create, join, and manage legal entities (companies).
+- **Legal Entity**: Users can create, join legal entity (company).
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-entity-feature.png">
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/join-entity-feature.png">
