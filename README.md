@@ -6,9 +6,11 @@
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Features](#features)
+- [Luna eProcurement System](#luna-eprocurement-system)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Features](#features)
 
 ## Overview
 
@@ -64,5 +66,6 @@ You can check the `./Makefile` file for commands used in this project.
 - **Authentication**: Users can sign up and sign in to the application.
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/accounts-features.png">
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/sign-up-features.png">
 
 - **Legal Entity**: Users can create, join, and manage legal entities (companies).
