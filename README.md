@@ -124,3 +124,17 @@ The following features are available for all roles in the legal entity. Begins w
 - User can edit or delete the price of the vendor associated with the product:
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/edit-price.png">
+
+Next is the **Vendor** features:
+
+- User can view list of vendors, search for vendors by code, name or business number and delete vendor:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/vendor-list.png">
+
+- User can create vendor and upload vendor image:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-vendor.png">
+
+- User can view vendor detail and delete a contact of the vendor:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/vendor-detail.png">
