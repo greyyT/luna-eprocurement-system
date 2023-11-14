@@ -75,15 +75,28 @@ You can check the `./Makefile` file for commands used in this project.
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-entity-feature.png">
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/join-entity-feature.png">
 
-- **Legal Entity Manager**: Manager can manage users, departments (in a legal entity), teams (in a department) and other roles permission.
-  - User management (delete user from legal entity):
+In the legal entity, there are 5 roles in total: **Manager**, **Member**, **Administrator**, **Supervisor** and **Viewer**. **Manager** is the highest role in the legal entity and given to the one who creates that legal entity. **Manager** has the following features:
 
-<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/user-delete.png">
+- **Manager** can manage users in legal entity (delete user):
 
-  - Edit user role, department, team:
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/user-delete.png" width="100%">
+
+- **Manager** can edit user role, department and team:
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/user-edit.png">
 
-  - Department and team management (delete department from legal entity):
+- **Manager** can manage departments in legal entity (delete department):
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/department-delete.png">
+
+- **Manager** can create department with provided name and code:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-department.png">
+
+- **Manager** can create team in department with provided name and code:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-team.png">
+
+- **Manager** can configure roles in legal entity, give the role permession to *Reject* or *Approve* (see later in **Purchase Requisition** features):
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/config-role.png">
