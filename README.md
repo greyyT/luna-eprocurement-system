@@ -1,6 +1,6 @@
 # Luna eProcurement System
 
-*A fullstack company web app for enhanced project control and management.*
+> *A fullstack company web app for enhanced project control and management.*
 
 <p align='center'>
 <img width=100 src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/frontend/src/assets/icons/lunar-client.svg">
@@ -76,4 +76,14 @@ You can check the `./Makefile` file for commands used in this project.
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/join-entity-feature.png">
 
 - **Legal Entity Manager**: Manager can manage users, departments (in a legal entity), teams (in a department) and other roles permission.
-  - User management:
+  - User management (delete user from legal entity):
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/user-delete.png">
+
+  - Edit user role, department, team:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/user-edit.png">
+
+  - Department and team management (delete department from legal entity):
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/department-delete.png">

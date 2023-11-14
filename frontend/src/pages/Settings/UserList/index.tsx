@@ -13,11 +13,17 @@ import useCurrentUser from '@/hooks/useCurrentUser';
 
 import UserPortrait from '@/assets/images/user-portrait.png';
 import { AxiosError } from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const UserList = () => {
   useEffect(() => {
     document.title = 'User List';
   }, []);
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  const currentPage = params.get('page') || 1;
 
   // Modal props
   const isOpen = useModal((state) => state.isOpen);
@@ -32,7 +38,7 @@ const UserList = () => {
   const confirmationModalTransition = useMountTransition(isConfirmationOpen, 200);
 
   const { data: user } = useCurrentUser();
-  const { data: memberList, isLoading: memberListLoading, mutate } = useMemberList();
+  const { data: memberList, isLoading: memberListLoading, mutate } = useMemberList(currentPage);
 
   const [loading, setLoading] = useState<boolean>(false);
 

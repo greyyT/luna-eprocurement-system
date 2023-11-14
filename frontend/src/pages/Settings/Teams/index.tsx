@@ -17,7 +17,7 @@ const Teams = () => {
   }, []);
 
   const { data: entityInfo, isLoading: entityInfoLoading, mutate } = useCurrentEntity();
-  const { mutate: mutateMemberList } = useMemberList();
+  const { mutate: mutateMemberList } = useMemberList(1);
 
   const [loading, setLoading] = useState<boolean>(false);
 

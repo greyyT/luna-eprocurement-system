@@ -22,8 +22,8 @@ const accountListSchema = z.object({
   currentPage: z.number(),
 });
 
-const useMemberList = () => {
-  const { data, error, isLoading, mutate } = useSWR(`/api/entity/account`, fetcher, {
+const useMemberList = (page: number | string | undefined) => {
+  const { data, error, isLoading, mutate } = useSWR(`/api/entity/account?page=${page}&size=5`, fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
