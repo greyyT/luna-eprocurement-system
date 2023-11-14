@@ -100,3 +100,27 @@ In the legal entity, there are 5 roles in total: **Manager**, **Member**, **Admi
 - **Manager** can configure roles in legal entity, give the role permession to *Reject* or *Approve* (see later in **Purchase Requisition** features):
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/config-role.png">
+
+Only the manager can access this **Settings** page and manage user in the legal entity.
+
+The following features are available for all roles in the legal entity. Begins with **Product** features:
+
+- User can view list of products, search for products by vendor, SKU, code and name and delete product:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/product-list.png">
+
+- User can create product and upload product image:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-product.png">
+
+- User can view product detail:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/product-detail.png">
+
+- User can associate product with vendor by add a price for that product:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/add-price.png">
+
+- User can edit or delete the price of the vendor associated with the product:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/edit-price.png">

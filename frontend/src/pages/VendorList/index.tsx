@@ -38,7 +38,7 @@ const VendorList = () => {
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
   const confirmationModalTransition = useMountTransition(confirmationModalOpen, 200);
-  const [vendorId, setVendorId] = useState<string>('');
+  const [vendorCode, setVendorCode] = useState<string>('');
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -65,7 +65,7 @@ const VendorList = () => {
     setIsLoading(true);
 
     try {
-      await axiosInstance.delete(`/api/vendor/${vendorId}`);
+      await axiosInstance.delete(`/api/vendor/${vendorCode}`);
       await mutate();
       await mutateProductList();
       toast.success('Vendor deleted successfully');
@@ -184,7 +184,7 @@ const VendorList = () => {
                     <div className="flex items-center">
                       <button
                         onClick={() => {
-                          setVendorId(vendor?.id);
+                          setVendorCode(vendor?.code);
                           setConfirmationModalOpen(true);
                         }}
                         className="relative h-5 w-4 ml-4 trash-selector"

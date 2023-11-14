@@ -97,7 +97,7 @@ class Vendor(models.Model):
 
 class Price(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.FloatField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='prices', db_index=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='prices', db_index=True)
     

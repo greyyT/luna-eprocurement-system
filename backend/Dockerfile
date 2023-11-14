@@ -13,4 +13,4 @@ RUN pip install --upgrade pip && \
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
+CMD ["sh", "-c", "python manage.py makemigrations api && python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
