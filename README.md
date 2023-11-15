@@ -11,6 +11,7 @@
 - [Luna eProcurement System](#luna-eprocurement-system)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
+  - [App Architecture](#app-architecture)
   - [Installation](#installation)
   - [Features](#features)
 
@@ -21,6 +22,14 @@ The <b>Luna eProcurement System</b> is an open-source project designed to simpli
 </p>
 
 Check out [Luna eProcurement System](https://greyyt.github.io/luna-eprocurement-system/) for live demo.
+
+## App Architecture
+
+The figure below gives an overview of the tools, languages, or frameworks that will be used to build this application.
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/architecture.png">
+</p>
 
 ## Installation
 
@@ -36,7 +45,7 @@ cd luna-eprocurement-system
 
 ```ini
 VITE_DEPLOYMENT=local
-VITE_BACKEND_API=http://localhost:8000
+VITE_BACKEND_API=http://localhost:8080/
 ```
 
 3. Create a `.env` file in `./backend/core` with these values
@@ -138,3 +147,7 @@ Next is the **Vendor** features:
 - User can view vendor detail and delete a contact of the vendor:
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/vendor-detail.png">
+
+- User can add contact to the vendor:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/add-contact.png">
