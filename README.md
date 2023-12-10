@@ -72,6 +72,11 @@ Access the application in your web browser ([http://localhost:3000/](http://loca
 
 You can check the `./Makefile` file for commands used in this project.
 
+To stop the application, simply run:
+```sh
+make down
+```
+
 ## Features
 
 - **Authentication**: Users can sign up and sign in to the application.
@@ -151,3 +156,43 @@ Next is the **Vendor** features:
 - User can add contact to the vendor:
 
 <img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/add-contact.png">
+
+Next is the **Project** features:
+
+- User can view list of projects, search for projects by code, name or label and delete project:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/project-list.png">
+
+- User can create project with a purchase allowance (see in later **Purchase Requisition** features):
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/create-project.png">
+
+- User can modify project title, label and mark project as default:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/edit-project.png">
+
+Next is the **Purchase Requisition** features:
+
+- User can view list of purchase requisitions in kanban style, filter by dates and search for purchase requisitions by code or name:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/purchase-requisition.png">
+
+- User can view purchase requisition detail with all information:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/purchase-requisition-detail.png">
+
+- User can comment, edit or delete comment in purchase requisition detail:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/purchase-requisition-comment.png">
+
+- User can drag and drop purchase requisition to change its status like kanban:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/purchase-requisition-action.png">
+
+- User can approve or reject (with reason) purchase requisition:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/purchase-requisition-approve.png">
+
+- Approved purchase requisition can then be dragged and dropped to Completed status, which means the purchase requisition is completed and will count to the purchase allowance of the project, or to Rejected status, which means the purchase requisition is rejected and will not count to the purchase allowance of the project:
+
+<img src="https://raw.githubusercontent.com/greyyT/luna-eprocurement-system/main/static/purchase-requisition-completed.png">

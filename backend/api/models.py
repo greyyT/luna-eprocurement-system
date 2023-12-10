@@ -125,8 +125,8 @@ class Project(models.Model):
     code = models.CharField(max_length=200, unique=True, db_index=True)
     label = models.CharField(max_length=200)
     is_default = models.BooleanField(default=False)
-    purchase_allowance = models.DecimalField(max_digits=10, decimal_places=2)
-    current_purchase = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    purchase_allowance = models.IntegerField(default=0)
+    current_purchase = models.FloatField(default=0)
     purchase_count = models.IntegerField(default=0)
     legal_entity = models.ForeignKey(LegalEntity, on_delete=models.CASCADE, related_name='projects', db_index=True)
     

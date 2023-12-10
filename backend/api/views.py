@@ -593,11 +593,11 @@ def create_and_list_project(request, user: User):
     
 @api_view(['PATCH', 'DELETE'])
 @auth_handler
-def delete_and_update_project(request, user: User, project_code):
+def delete_and_update_project(request, user: User, project_id):
     data = request.data
     
     legal_entity = user.legal_entity
-    project = legal_entity.projects.get(code=project_code)
+    project = Project.objects.get(id=project_id)
     
     if request.method == 'PATCH':
         serializer = PatchProjectSerializer(project, data=data, partial=True)
@@ -619,9 +619,9 @@ def delete_and_update_project(request, user: User, project_code):
     
 @api_view(['POST'])
 @auth_handler
-def mark_default_project(request, user: User, project_code):
+def mark_default_project(request, user: User, project_id):
     legal_entity = user.legal_entity
-    project = legal_entity.projects.get(code=project_code)
+    project = Project.objects.get(id=project_id)
     
     if project.is_default:
         return Response({"message": "Project is already default project"})

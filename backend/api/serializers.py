@@ -42,8 +42,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
     
     def get_role(self, obj):
         return obj.role.role if obj.role else None
-    
-    
+
+
 class UserLegalEntitySerializer(serializers.ModelSerializer):
     legalEntityCode = serializers.SerializerMethodField()
     departmentCode = serializers.SerializerMethodField()
@@ -55,85 +55,85 @@ class UserLegalEntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'role', 'legalEntityCode', 'departmentCode', 'departmentName', 'teamCode', 'teamName']
-        
-        
+
+
     def get_legalEntityCode(self, obj):
         return obj.legal_entity.legal_entity_code if obj.legal_entity else None
-        
+
     def get_departmentCode(self, obj):
         return obj.department.code if obj.department else None
-    
+
     def get_departmentName(self, obj):
         return obj.department.name if obj.department else None
-    
+
     def get_teamCode(self, obj):
         return obj.team.code if obj.team else None
-    
+
     def get_teamName(self, obj):
         return obj.team.name if obj.team else None
-    
+
     def get_role(self, obj):
         return obj.role.role if obj.role else None
-        
-        
+
+
 class TeamSerializer(serializers.ModelSerializer):
     teamCode = serializers.CharField(source="code")
     teamName = serializers.CharField(source="name")
-    
+
     def __init__(self, *args, **kwargs):
         department = kwargs.pop('department', None)
         super().__init__(*args, **kwargs)
         self.department = department
-    
+
     class Meta:
         model = Team
         fields = ['id', 'teamCode', 'teamName']
-        
-        
+
+
     def create(self, validated_data):
         instance = self.Meta.model(**validated_data)
-        
+
         instance.department = self.department
-        
+
         instance.save()
-        
+
         return instance
-    
-    
+
+
 class DepartmentSerializer(serializers.ModelSerializer):
     # Define the teams field using the TeamSerializer for nested serialization
     teams = TeamSerializer(many=True, read_only=True)
-    
+
     # Map the 'code' field in the model to 'departmentCode' in the serializer
     departmentCode = serializers.CharField(source="code")
-    
+
     # Map the 'name' field in the model to 'departmentName' in the serializer
     departmentName = serializers.CharField(source="name")
-    
+
     def __init__(self, *args, **kwargs):
         legal_entity = kwargs.pop('legal_entity', None)
         super().__init__(*args, **kwargs)
         self.legal_entity = legal_entity
-    
+
     class Meta:
         model = Department
         # Specify the fields to include in the serialized output
         fields = ['id', 'departmentCode', 'departmentName', 'teams']
-    
-    
+
+
     def create(self, validated_data):
         # Create a new Department instance with the validated data
         instance = self.Meta.model(**validated_data)
-        
+
         # Set the 'legal_entity' field of the Department instance to the retrieved LegalEntity
         instance.legal_entity = self.legal_entity
-        
+
         # Save the Department instance to the database
         instance.save()
-        
+
         # Return the created Department instance
         return instance
-        
+
 
 class LegalEntitySerializer(serializers.ModelSerializer):
     departments = DepartmentSerializer(many=True, read_only=True)
@@ -189,12 +189,12 @@ class ProductSerializer(serializers.ModelSerializer):
     dimension = serializers.DictField(write_only=True)
     productImage = serializers.CharField(required=False)
     providedVendorInfo = PriceSerializer(many=True, read_only=True, source='prices')
-    
+
     def __init__(self, *args, **kwargs):
         legal_entity = kwargs.pop('legal_entity', None)
         super().__init__(*args, **kwargs)
         self.legal_entity = legal_entity
-    
+
     class Meta:
         model = Product
         fields = [
@@ -212,8 +212,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'productImage',
             'providedVendorInfo'
         ]
-    
-    
+
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['dimension'] = {
@@ -223,21 +223,21 @@ class ProductSerializer(serializers.ModelSerializer):
         }
         ret['productImage'] = ('http://localhost:8080' + instance.image.url) if instance.image else None
         return ret
-        
+
     def create(self, validated_data):
         dimension = validated_data.pop('dimension', None)
         productImage = validated_data.pop('productImage', None)
-        
+
         instance = self.Meta.model(**validated_data)
-        
+
         instance.legal_entity = self.legal_entity
         instance.width = dimension.get('width', 0)
         instance.length = dimension.get('length', 0)
         instance.height = dimension.get('height', 0)
         instance.image = base64_file(productImage, name=instance.code) if productImage else None
-        
+
         instance.save()
-        
+
         return instance
 
 
@@ -246,16 +246,16 @@ class ContactSerializer(serializers.ModelSerializer):
         vendor = kwargs.pop('vendor', None)
         super().__init__(*args, **kwargs)
         self.vendor = vendor
-    
+
     class Meta:
         model = Contact
         fields = ['id', 'name', 'phone', 'position']
-        
+
     def create(self, validated_data):
         instance = self.Meta.model(**validated_data)
         instance.vendor = self.vendor
         instance.save()
-        
+
         return instance
 
 
@@ -269,7 +269,7 @@ class VendorSerializer(serializers.ModelSerializer):
         legal_entity = kwargs.pop('legal_entity', None)
         super().__init__(*args, **kwargs)
         self.legal_entity = legal_entity
-    
+
     class Meta:
         model = Vendor
         fields = ['id', 'businessName', 'code', 'description', 'businessNumber', 'vendorImage', 'contacts']
@@ -296,8 +296,8 @@ class VendorSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     isDefault = serializers.BooleanField(source='is_default', required=False)
-    purchaseAllowance = serializers.DecimalField(source='purchase_allowance', max_digits=10, decimal_places=2)
-    currentPurchase = serializers.DecimalField(source='current_purchase', max_digits=10, decimal_places=2, read_only=True)
+    purchaseAllowance = serializers.FloatField(source='purchase_allowance')
+    currentPurchase = serializers.FloatField(source='current_purchase', read_only=True)
     purchaseCount = serializers.IntegerField(source='purchase_count', read_only=True)
     
     def __init__(self, *args, **kwargs):
