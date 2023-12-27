@@ -1,13 +1,16 @@
-import SignInInfo from '@/components/infoModals/SignInInfo';
+import InfoModal from '@/components/infoModals/InfoModal';
 import useCurrentUser from '@/hooks/useCurrentUser';
 import useMountTransition from '@/hooks/useMountTransition';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const InfoModalLayout = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const hasTransitionedIn = useMountTransition(isOpen, 200);
 
   const { isLoading } = useCurrentUser();
+
+  const location = useLocation();
 
   return (
     <>
@@ -20,11 +23,12 @@ const InfoModalLayout = ({ children }: { children: React.ReactNode }) => {
           >
             ?
           </button>
-          <SignInInfo
+          <InfoModal
             isOpen={isOpen}
             hasTransitionedIn={hasTransitionedIn}
             isLoading={false}
             onClose={() => setIsOpen(false)}
+            location={location.pathname}
           />
         </>
       )}
