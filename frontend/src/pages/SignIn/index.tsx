@@ -35,6 +35,8 @@ const SignIn = () => {
     document.title = 'Sign In';
   }, []);
 
+  console.log('ENV', import.meta.env.VITE_BACKEND_API);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
@@ -93,7 +95,7 @@ const SignIn = () => {
   return (
     <>
       <form onSubmit={onSubmit}>
-        <h1 className="font-bold font-inter text-3xl ">Sign In</h1>
+        <h1 className="font-bold font-inter text-3xl">Sign In</h1>
         <div className="flex flex-col gap-4 mt-10">
           <Input
             label="Email"
